@@ -1,0 +1,12 @@
+{
+  "id": "v1",
+  "type": "World",
+  "label": "Ashenmere",
+  "author": "markj",
+  "depth": 0,
+  "epoch": 1,
+  "created": "2026-03-29T13:03:22.007Z",
+  "commitHash": "7bf018adbee3e551403f278b8d3df991e9a32030",
+  "branch": "master",
+  "desc": "Root world for Ashenmere."
+}

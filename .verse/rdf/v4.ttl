@@ -1,0 +1,8 @@
+@prefix verse: <https://ns.foxximediums.com/verse#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<v4> a verse:Location ;
+    rdfs:label "The Cinder Library"@en ;
+    verse:authoredBy <markj> ;
+    verse:extends <v1> .

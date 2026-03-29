@@ -1,0 +1,510 @@
+@prefix verse: <https://ns.foxximediums.com/verse#> .
+@prefix cg:    <https://ns.foxximediums.com/context-graphs#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix schema: <http://schema.org/> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix eas:   <https://ns.foxximediums.com/eas#> .
+
+# =============================================================================
+# VERSE ONTOLOGY v0.1
+# Proof of Creativity — Decentralized Multiverse World-Building Protocol
+#
+# Namespace: https://ns.foxximediums.com/verse#
+# License: CC BY 4.0
+# Author: Mark Spivey / Foxxi Mediums Inc.
+# Built on: W3C RDF 1.2, Context Graphs 1.0, Solid Protocol
+# =============================================================================
+
+verse: a owl:Ontology ;
+    rdfs:label "Verse Ontology"@en ;
+    rdfs:comment """Formal vocabulary for decentralized multiverse world-building 
+    with Proof of Creativity influence scoring. Defines narrative objects, 
+    compositional reuse relations, provenance chains, and on-chain attestation 
+    anchors over a git-backed content-addressable DAG."""@en ;
+    owl:versionInfo "0.1.0" ;
+    dcterms:creator <https://id.foxximediums.com/markj/profile#me> ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    owl:imports cg: .
+
+# =============================================================================
+# 1. NARRATIVE OBJECT CLASSES
+#    The compositional units of the multiverse.
+# =============================================================================
+
+verse:NarrativeObject a owl:Class ;
+    rdfs:label "Narrative Object"@en ;
+    rdfs:comment """Abstract superclass for all typed narrative units. Every 
+    narrative object is also a Context Graph context — a typed, compositional 
+    named graph with explicit provenance and boundary."""@en ;
+    rdfs:subClassOf cg:Context .
+
+verse:World a owl:Class ;
+    rdfs:subClassOf verse:NarrativeObject ;
+    rdfs:label "World"@en ;
+    rdfs:comment """A self-consistent narrative universe. The top-level 
+    compositional container. A World is a presheaf: a functor from the 
+    opposite of the category of narrative contexts to Set."""@en .
+
+verse:Verse a owl:Class ;
+    rdfs:subClassOf verse:NarrativeObject ;
+    rdfs:label "Verse"@en ;
+    rdfs:comment """A coherent narrative fragment within a World — a chapter, 
+    episode, arc, lore entry, or self-contained scenario. The atomic unit 
+    of authorship, forking, and influence scoring."""@en .
+
+verse:Character a owl:Class ;
+    rdfs:subClassOf verse:NarrativeObject ;
+    rdfs:label "Character"@en ;
+    rdfs:comment "An agent or entity that acts within a narrative context."@en .
+
+verse:Location a owl:Class ;
+    rdfs:subClassOf verse:NarrativeObject ;
+    rdfs:label "Location"@en ;
+    rdfs:comment "A place, realm, dimension, or spatial context."@en .
+
+verse:System a owl:Class ;
+    rdfs:subClassOf verse:NarrativeObject ;
+    rdfs:label "System"@en ;
+    rdfs:comment """A rule system — magic system, physics, economy, social 
+    structure, technology tree — that constrains or enables narrative 
+    possibilities within a World."""@en .
+
+verse:Event a owl:Class ;
+    rdfs:subClassOf verse:NarrativeObject ;
+    rdfs:label "Event"@en ;
+    rdfs:comment """A canonical occurrence in the narrative timeline. Events 
+    are the morphisms of the narrative category: they transform world-states."""@en .
+
+verse:Artifact a owl:Class ;
+    rdfs:subClassOf verse:NarrativeObject ;
+    rdfs:label "Artifact"@en ;
+    rdfs:comment """A significant object within the narrative — weapon, text, 
+    technology, substance — with its own provenance and lore."""@en .
+
+verse:Faction a owl:Class ;
+    rdfs:subClassOf verse:NarrativeObject ;
+    rdfs:label "Faction"@en ;
+    rdfs:comment "A group, organization, species, or collective entity."@en .
+
+verse:Timeline a owl:Class ;
+    rdfs:subClassOf verse:NarrativeObject ;
+    rdfs:label "Timeline"@en ;
+    rdfs:comment """An ordered sequence of Events. Multiple Timelines within 
+    a World represent branching narratives or parallel histories."""@en .
+
+# =============================================================================
+# 2. COMPOSITIONAL RELATIONS
+#    How narrative objects compose, reference, and reuse each other.
+# =============================================================================
+
+# --- Structural composition ---
+
+verse:containsVerse a owl:ObjectProperty ;
+    rdfs:label "contains verse"@en ;
+    rdfs:domain verse:World ;
+    rdfs:range verse:Verse ;
+    rdfs:comment "A World contains Verses as compositional sub-contexts."@en .
+
+verse:inhabits a owl:ObjectProperty ;
+    rdfs:label "inhabits"@en ;
+    rdfs:domain verse:Character ;
+    rdfs:range verse:World ;
+    rdfs:comment "A Character exists within a World."@en .
+
+verse:takesPlaceIn a owl:ObjectProperty ;
+    rdfs:label "takes place in"@en ;
+    rdfs:domain verse:Event ;
+    rdfs:range verse:Location .
+
+verse:governedBy a owl:ObjectProperty ;
+    rdfs:label "governed by"@en ;
+    rdfs:domain verse:World ;
+    rdfs:range verse:System ;
+    rdfs:comment "A World's possibilities are constrained by a System."@en .
+
+verse:belongsToTimeline a owl:ObjectProperty ;
+    rdfs:label "belongs to timeline"@en ;
+    rdfs:domain verse:Event ;
+    rdfs:range verse:Timeline .
+
+# --- Reuse and derivation (the influence DAG edges) ---
+
+verse:reuses a owl:ObjectProperty ;
+    rdfs:label "reuses"@en ;
+    rdfs:domain verse:NarrativeObject ;
+    rdfs:range verse:NarrativeObject ;
+    rdfs:subPropertyOf prov:wasDerivedFrom ;
+    rdfs:comment """The subject narrative object structurally reuses elements 
+    from the object. This is the primary edge for influence propagation. 
+    Analogous to a pullback: the subject pulls back structure from the 
+    object into its own context."""@en .
+
+verse:extends a owl:ObjectProperty ;
+    rdfs:subPropertyOf verse:reuses ;
+    rdfs:label "extends"@en ;
+    rdfs:comment """A strict extension: the subject adds new structure to the 
+    object without contradicting it. The narrative-category morphism."""@en .
+
+verse:forks a owl:ObjectProperty ;
+    rdfs:subPropertyOf verse:reuses ;
+    rdfs:label "forks"@en ;
+    rdfs:comment """A divergent derivation: the subject takes elements from 
+    the object but modifies or contradicts some of its canon. Creates 
+    a branch in the narrative DAG."""@en .
+
+verse:merges a owl:ObjectProperty ;
+    rdfs:label "merges"@en ;
+    rdfs:domain verse:NarrativeObject ;
+    rdfs:range rdf:List ;  # list of NarrativeObjects being merged
+    rdfs:comment """The subject synthesizes multiple source objects into a 
+    unified narrative. High merge centrality signals connective creativity. 
+    The coproduct in the narrative category."""@en .
+
+verse:references a owl:ObjectProperty ;
+    rdfs:label "references"@en ;
+    rdfs:domain verse:NarrativeObject ;
+    rdfs:range verse:NarrativeObject ;
+    rdfs:comment """A lightweight citation: the subject mentions or alludes 
+    to the object without structurally depending on it. Contributes to 
+    influence score at a lower weight than verse:reuses."""@en .
+
+verse:redefines a owl:ObjectProperty ;
+    rdfs:subPropertyOf verse:forks ;
+    rdfs:label "redefines"@en ;
+    rdfs:comment """The subject takes an entity from the object's context and 
+    fundamentally reinterprets it — e.g., redefining what 'dragons' mean. 
+    Semiotically: same sign, new interpretant. High novelty delta signal."""@en .
+
+verse:translates a owl:ObjectProperty ;
+    rdfs:subPropertyOf verse:reuses ;
+    rdfs:label "translates"@en ;
+    rdfs:comment """The subject adapts the object into a different genre, 
+    setting, or medium while preserving structural isomorphism. A 
+    structure-preserving functor between narrative categories."""@en .
+
+# =============================================================================
+# 3. PROVENANCE & AUTHORSHIP
+#    Who made what, when, anchored to git and DIDs.
+# =============================================================================
+
+verse:Author a owl:Class ;
+    rdfs:subClassOf prov:Agent, foaf:Agent ;
+    rdfs:label "Author"@en ;
+    rdfs:comment """A creative agent — human or AI — with a decentralized 
+    identity (DID, WebID, or Ethereum address)."""@en .
+
+verse:authoredBy a owl:ObjectProperty ;
+    rdfs:label "authored by"@en ;
+    rdfs:domain verse:NarrativeObject ;
+    rdfs:range verse:Author ;
+    rdfs:subPropertyOf prov:wasAttributedTo, dcterms:creator .
+
+verse:webId a owl:DatatypeProperty ;
+    rdfs:label "WebID"@en ;
+    rdfs:domain verse:Author ;
+    rdfs:range xsd:anyURI ;
+    rdfs:comment "Solid WebID URI for the author."@en .
+
+verse:ethereumAddress a owl:DatatypeProperty ;
+    rdfs:label "Ethereum address"@en ;
+    rdfs:domain verse:Author ;
+    rdfs:range xsd:string ;
+    rdfs:comment "0x-prefixed Ethereum address linked via ERC-4361 SIWE."@en .
+
+verse:did a owl:DatatypeProperty ;
+    rdfs:label "DID"@en ;
+    rdfs:domain verse:Author ;
+    rdfs:range xsd:anyURI ;
+    rdfs:comment "W3C Decentralized Identifier."@en .
+
+# --- Git provenance ---
+
+verse:GitCommit a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Git Commit"@en ;
+    rdfs:comment "A git commit representing a snapshot of a narrative object."@en .
+
+verse:commitHash a owl:DatatypeProperty ;
+    rdfs:label "commit hash"@en ;
+    rdfs:domain verse:GitCommit ;
+    rdfs:range xsd:string ;
+    rdfs:comment "SHA-256 content-addressable hash of the git commit."@en .
+
+verse:committedAt a owl:DatatypeProperty ;
+    rdfs:label "committed at"@en ;
+    rdfs:domain verse:GitCommit ;
+    rdfs:range xsd:dateTime .
+
+verse:parentCommit a owl:ObjectProperty ;
+    rdfs:label "parent commit"@en ;
+    rdfs:domain verse:GitCommit ;
+    rdfs:range verse:GitCommit ;
+    rdfs:comment "The DAG edge: parent commit(s) in the git history."@en .
+
+verse:snapshotOf a owl:ObjectProperty ;
+    rdfs:label "snapshot of"@en ;
+    rdfs:domain verse:GitCommit ;
+    rdfs:range verse:NarrativeObject ;
+    rdfs:comment "Which narrative object this commit captures."@en .
+
+verse:repository a owl:DatatypeProperty ;
+    rdfs:label "repository"@en ;
+    rdfs:domain verse:NarrativeObject ;
+    rdfs:range xsd:anyURI ;
+    rdfs:comment "Git remote URI for the verse repository."@en .
+
+verse:branch a owl:DatatypeProperty ;
+    rdfs:label "branch"@en ;
+    rdfs:domain verse:NarrativeObject ;
+    rdfs:range xsd:string .
+
+# =============================================================================
+# 4. INFLUENCE SCORING (Proof of Creativity)
+#    On-graph metadata for the influence computation.
+# =============================================================================
+
+verse:InfluenceSnapshot a owl:Class ;
+    rdfs:label "Influence Snapshot"@en ;
+    rdfs:comment """A timestamped record of influence scores for a set of 
+    narrative objects. Periodically computed and anchored on-chain via 
+    a Merkle root attestation."""@en .
+
+verse:InfluenceScore a owl:Class ;
+    rdfs:label "Influence Score"@en ;
+    rdfs:comment "A computed influence metric for a single narrative object at a point in time."@en .
+
+verse:hasScore a owl:ObjectProperty ;
+    rdfs:domain verse:InfluenceSnapshot ;
+    rdfs:range verse:InfluenceScore .
+
+verse:scoredObject a owl:ObjectProperty ;
+    rdfs:label "scored object"@en ;
+    rdfs:domain verse:InfluenceScore ;
+    rdfs:range verse:NarrativeObject .
+
+verse:totalInfluence a owl:DatatypeProperty ;
+    rdfs:label "total influence"@en ;
+    rdfs:domain verse:InfluenceScore ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Composite influence score (PageRank-like stationary distribution value)."@en .
+
+verse:forkDepth a owl:DatatypeProperty ;
+    rdfs:label "fork depth"@en ;
+    rdfs:domain verse:InfluenceScore ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Maximum depth of the descendant fork tree."@en .
+
+verse:structuralReuseCount a owl:DatatypeProperty ;
+    rdfs:label "structural reuse count"@en ;
+    rdfs:domain verse:InfluenceScore ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of downstream objects linked via verse:reuses or subproperties."@en .
+
+verse:mergeCentrality a owl:DatatypeProperty ;
+    rdfs:label "merge centrality"@en ;
+    rdfs:domain verse:InfluenceScore ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment """Fraction of merge commits in the DAG that include elements 
+    from this object. Measures connective tissue contribution."""@en .
+
+verse:noveltyDelta a owl:DatatypeProperty ;
+    rdfs:label "novelty delta"@en ;
+    rdfs:domain verse:InfluenceScore ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment """Information-theoretic novelty: KL divergence of this object's 
+    content from its parent contexts, weighted by downstream adoption. 
+    High novelty + high adoption = genuine creative contribution."""@en .
+
+verse:epoch a owl:DatatypeProperty ;
+    rdfs:label "epoch"@en ;
+    rdfs:domain verse:InfluenceSnapshot ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "The reward epoch number for this snapshot."@en .
+
+verse:computedAt a owl:DatatypeProperty ;
+    rdfs:domain verse:InfluenceSnapshot ;
+    rdfs:range xsd:dateTime .
+
+verse:merkleRoot a owl:DatatypeProperty ;
+    rdfs:label "Merkle root"@en ;
+    rdfs:domain verse:InfluenceSnapshot ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Keccak-256 Merkle root of all scores in this snapshot, anchored on-chain."@en .
+
+# =============================================================================
+# 5. ON-CHAIN ATTESTATION ANCHORS
+#    Linking off-chain narrative provenance to on-chain attestations.
+# =============================================================================
+
+verse:Attestation a owl:Class ;
+    rdfs:label "Attestation"@en ;
+    rdfs:comment """An on-chain attestation (EAS or similar) that anchors 
+    authorship claims, influence snapshots, or license grants."""@en .
+
+verse:attestationType a owl:DatatypeProperty ;
+    rdfs:domain verse:Attestation ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Type: 'authorship', 'influence_snapshot', 'license_grant', 'merge_ratification'."@en .
+
+verse:attestationUid a owl:DatatypeProperty ;
+    rdfs:label "attestation UID"@en ;
+    rdfs:domain verse:Attestation ;
+    rdfs:range xsd:string ;
+    rdfs:comment "EAS attestation UID (bytes32)."@en .
+
+verse:chainId a owl:DatatypeProperty ;
+    rdfs:domain verse:Attestation ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "EVM chain ID where the attestation lives."@en .
+
+verse:attester a owl:ObjectProperty ;
+    rdfs:domain verse:Attestation ;
+    rdfs:range verse:Author .
+
+verse:attests a owl:ObjectProperty ;
+    rdfs:domain verse:Attestation ;
+    rdfs:range verse:NarrativeObject ;
+    rdfs:comment "The narrative object this attestation covers."@en .
+
+verse:attestsSnapshot a owl:ObjectProperty ;
+    rdfs:domain verse:Attestation ;
+    rdfs:range verse:InfluenceSnapshot .
+
+# =============================================================================
+# 6. LICENSING & RIGHTS
+#    Creative Commons + custom reuse terms as structured data.
+# =============================================================================
+
+verse:License a owl:Class ;
+    rdfs:label "License"@en ;
+    rdfs:comment "Terms under which a narrative object may be reused."@en .
+
+verse:licensedUnder a owl:ObjectProperty ;
+    rdfs:domain verse:NarrativeObject ;
+    rdfs:range verse:License .
+
+verse:licenseUri a owl:DatatypeProperty ;
+    rdfs:domain verse:License ;
+    rdfs:range xsd:anyURI ;
+    rdfs:comment "URI of the license (e.g., CC BY 4.0, CC BY-SA 4.0)."@en .
+
+verse:requiresAttribution a owl:DatatypeProperty ;
+    rdfs:domain verse:License ;
+    rdfs:range xsd:boolean .
+
+verse:allowsCommercial a owl:DatatypeProperty ;
+    rdfs:domain verse:License ;
+    rdfs:range xsd:boolean .
+
+verse:allowsDerivatives a owl:DatatypeProperty ;
+    rdfs:domain verse:License ;
+    rdfs:range xsd:boolean .
+
+verse:shareAlike a owl:DatatypeProperty ;
+    rdfs:domain verse:License ;
+    rdfs:range xsd:boolean .
+
+verse:revenueSharePercent a owl:DatatypeProperty ;
+    rdfs:domain verse:License ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment """Optional: percentage of downstream revenue that flows 
+    back to the original author via the influence DAG."""@en .
+
+# =============================================================================
+# 7. SEMIOTIC GROUNDING (from SAT)
+#    Narrative objects as sign-object-interpretant triples.
+# =============================================================================
+
+verse:Sign a owl:Class ;
+    rdfs:label "Sign"@en ;
+    rdfs:comment """Peircean sign: the representamen. In narrative context, 
+    this is the surface-level signifier — a name, symbol, trope, or 
+    structural pattern."""@en .
+
+verse:Interpretant a owl:Class ;
+    rdfs:label "Interpretant"@en ;
+    rdfs:comment """The meaning generated by the sign in a specific context. 
+    When verse:redefines is used, the sign is preserved but the 
+    interpretant changes — this is the formal mechanism for creative 
+    reinterpretation."""@en .
+
+verse:signifies a owl:ObjectProperty ;
+    rdfs:domain verse:NarrativeObject ;
+    rdfs:range verse:Sign ;
+    rdfs:comment "The sign(s) this narrative object instantiates."@en .
+
+verse:interpretsAs a owl:ObjectProperty ;
+    rdfs:domain verse:NarrativeObject ;
+    rdfs:range verse:Interpretant ;
+    rdfs:comment """How this narrative object interprets a sign in its 
+    context. Different from the source context's interpretant when 
+    verse:redefines is in play."""@en .
+
+verse:interpretantShift a owl:ObjectProperty ;
+    rdfs:label "interpretant shift"@en ;
+    rdfs:domain verse:NarrativeObject ;
+    rdfs:range verse:NarrativeObject ;
+    rdfs:comment """Links two objects that share a Sign but diverge in 
+    Interpretant. This is the semiotic fingerprint of genuine creative 
+    reinterpretation, and scores high on noveltyDelta."""@en .
+
+# =============================================================================
+# 8. AGENT INTEGRATION (for AI co-creation)
+# =============================================================================
+
+verse:AgentAuthor a owl:Class ;
+    rdfs:subClassOf verse:Author ;
+    rdfs:label "Agent Author"@en ;
+    rdfs:comment """An AI agent that contributes to verse creation. Must 
+    have provenance linking back to the human author who directed it. 
+    Agent contributions inherit the human's creative direction but are 
+    distinctly attributed for transparency."""@en .
+
+verse:directedBy a owl:ObjectProperty ;
+    rdfs:label "directed by"@en ;
+    rdfs:domain verse:AgentAuthor ;
+    rdfs:range verse:Author ;
+    rdfs:comment """The human author whose creative direction the agent 
+    operates under. Influence rewards flow to the director."""@en .
+
+verse:agentUrn a owl:DatatypeProperty ;
+    rdfs:domain verse:AgentAuthor ;
+    rdfs:range xsd:anyURI ;
+    rdfs:comment "Agent URN (e.g., urn:agent:anthropic:claude-code:vscode)."@en .
+
+# =============================================================================
+# 9. DISCOVERY (HyprCat-aligned affordances)
+# =============================================================================
+
+verse:NarrativeAffordance a owl:Class ;
+    rdfs:label "Narrative Affordance"@en ;
+    rdfs:comment """An advertised expansion point — an invitation for other 
+    authors to extend, fork, or fill a gap in a narrative. Exposed as 
+    Hydra hypermedia controls for programmatic discovery."""@en .
+
+verse:affordanceType a owl:DatatypeProperty ;
+    rdfs:domain verse:NarrativeAffordance ;
+    rdfs:range xsd:string ;
+    rdfs:comment """Type of affordance: 'open_plotline', 'unexplored_region', 
+    'undefined_system', 'character_vacancy', 'timeline_branch', 
+    'crossover_opportunity'."""@en .
+
+verse:offeredBy a owl:ObjectProperty ;
+    rdfs:domain verse:NarrativeAffordance ;
+    rdfs:range verse:NarrativeObject .
+
+verse:claimedBy a owl:ObjectProperty ;
+    rdfs:domain verse:NarrativeAffordance ;
+    rdfs:range verse:Author ;
+    rdfs:comment "Author who has claimed this affordance (WIP indicator)."@en .
+
+verse:hydraOperation a owl:DatatypeProperty ;
+    rdfs:domain verse:NarrativeAffordance ;
+    rdfs:range xsd:anyURI ;
+    rdfs:comment "Hydra operation URI for programmatic expansion."@en .

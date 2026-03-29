@@ -1,0 +1,16 @@
+{
+  "id": "v3",
+  "type": "Character",
+  "label": "The Archivist",
+  "author": "markj",
+  "depth": 1,
+  "epoch": 2,
+  "parents": [
+    "v1"
+  ],
+  "relation": "extends",
+  "created": "2026-03-29T13:03:30.680Z",
+  "commitHash": "7bf018adbee3e551403f278b8d3df991e9a32030",
+  "branch": "master",
+  "desc": "Extension of Ashenmere."
+}

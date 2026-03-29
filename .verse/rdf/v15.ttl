@@ -1,0 +1,10 @@
+@prefix verse: <https://ns.foxximediums.com/verse#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<v15> a verse:Verse ;
+    rdfs:label "The Deep Catalog"@en ;
+    verse:authoredBy <markj> ;
+    verse:merges <v4> ;
+    verse:merges <v9> ;
+    verse:merges <v12> .

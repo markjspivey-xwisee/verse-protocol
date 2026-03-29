@@ -1,0 +1,16 @@
+{
+  "id": "v13",
+  "type": "Event",
+  "label": "The Semiotic Fracture",
+  "author": "markj",
+  "depth": 4,
+  "epoch": 12,
+  "parents": [
+    "v11"
+  ],
+  "relation": "forks",
+  "created": "2026-03-29T13:03:47.691Z",
+  "commitHash": "7bf018adbee3e551403f278b8d3df991e9a32030",
+  "branch": "master",
+  "desc": "Fork of Ash on Glass."
+}

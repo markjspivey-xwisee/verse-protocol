@@ -1,0 +1,14 @@
+{
+  "name": "Ashenmere",
+  "version": "0.1.0",
+  "protocol": "verse-protocol",
+  "namespace": "https://ns.foxximediums.com/verse#",
+  "created": "2026-03-29T13:03:22.001Z",
+  "author": {
+    "name": "markj",
+    "webId": null,
+    "ethereumAddress": null,
+    "did": null
+  },
+  "epoch": 17
+}

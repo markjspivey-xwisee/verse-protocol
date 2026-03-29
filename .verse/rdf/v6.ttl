@@ -1,0 +1,9 @@
+@prefix verse: <https://ns.foxximediums.com/verse#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<v6> a verse:Verse ;
+    rdfs:label "The First Burning"@en ;
+    verse:authoredBy <markj> ;
+    verse:merges <v2> ;
+    verse:merges <v3> .

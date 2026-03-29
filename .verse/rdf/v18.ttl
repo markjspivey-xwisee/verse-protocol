@@ -1,0 +1,10 @@
+@prefix verse: <https://ns.foxximediums.com/verse#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<v18> a verse:Verse ;
+    rdfs:label "Ashenmere Reforged"@en ;
+    verse:authoredBy <markj> ;
+    verse:merges <v16> ;
+    verse:merges <v17> ;
+    verse:merges <v7> .

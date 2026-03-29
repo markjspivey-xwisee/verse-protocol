@@ -1,0 +1,16 @@
+{
+  "id": "v5",
+  "type": "Artifact",
+  "label": "Flame Grammar",
+  "author": "markj",
+  "depth": 2,
+  "epoch": 4,
+  "parents": [
+    "v2"
+  ],
+  "relation": "extends",
+  "created": "2026-03-29T13:03:31.472Z",
+  "commitHash": "7bf018adbee3e551403f278b8d3df991e9a32030",
+  "branch": "master",
+  "desc": "Extension of Pyro-Linguistics."
+}

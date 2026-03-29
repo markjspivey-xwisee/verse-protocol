@@ -1,0 +1,8 @@
+@prefix verse: <https://ns.foxximediums.com/verse#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<v2> a verse:System ;
+    rdfs:label "Pyro-Linguistics"@en ;
+    verse:authoredBy <markj> ;
+    verse:extends <v1> .

@@ -1,0 +1,16 @@
+{
+  "id": "v17",
+  "type": "Artifact",
+  "label": "The Unburnable Word",
+  "author": "markj",
+  "depth": 6,
+  "epoch": 16,
+  "parents": [
+    "v15"
+  ],
+  "relation": "extends",
+  "created": "2026-03-29T13:03:54.204Z",
+  "commitHash": "7bf018adbee3e551403f278b8d3df991e9a32030",
+  "branch": "master",
+  "desc": "Extension of The Deep Catalog."
+}

@@ -2,7 +2,7 @@ name: Verse Bot
 
 on:
   issues:
-    types: [labeled]
+    types: [opened]
 
 permissions:
   contents: write

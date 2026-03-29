@@ -1,0 +1,58 @@
+name: "☉ Link Your Identity"
+description: "Connect your GitHub account to your Ethereum address, WebID, or DID for attribution and rewards"
+title: "[Identity] "
+labels: ["identity-claim"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Link Your Identities
+
+        Connect your GitHub account to other identity systems so your verse contributions are properly attributed across the protocol.
+
+        Your GitHub identity is verified automatically. Other identities require proof:
+        - **Ethereum**: Paste a [Sign-In with Ethereum (ERC-4361)](https://login.xyz) signature, or we'll accept the claim as unverified for now
+        - **WebID**: Your WebID profile should link to your GitHub account via `foaf:account`
+        - **DID**: Your DID document should contain a GitHub verification
+
+        Leave fields blank if you don't have them yet — you can update later.
+
+  - type: input
+    id: display_name
+    attributes:
+      label: Display Name
+      description: "How you want to be credited in the multiverse"
+      placeholder: "e.g., Kael the Burner"
+    validations:
+      required: true
+
+  - type: input
+    id: ethereum_address
+    attributes:
+      label: Ethereum Address
+      description: "0x-prefixed address for on-chain attestations and $VERSE rewards"
+      placeholder: "0x1234...abcd"
+
+  - type: textarea
+    id: ethereum_signature
+    attributes:
+      label: Ethereum Signature (optional)
+      description: |
+        To verify ownership, sign this message with your wallet:
+        `I am {your-github-username} on GitHub and I claim this address for Verse Protocol`
+        Paste the signature here. If you skip this, the claim is stored as unverified.
+      placeholder: "0x..."
+
+  - type: input
+    id: webid
+    attributes:
+      label: Solid WebID
+      description: "Your WebID URI (e.g., https://yourpod.solidcommunity.net/profile/card#me)"
+      placeholder: "https://..."
+
+  - type: input
+    id: did
+    attributes:
+      label: Decentralized Identifier (DID)
+      description: "W3C DID (e.g., did:key:..., did:web:..., did:ethr:...)"
+      placeholder: "did:..."

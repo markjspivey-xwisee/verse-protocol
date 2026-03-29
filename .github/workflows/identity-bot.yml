@@ -1,0 +1,210 @@
+name: Identity Bot
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  process-identity-claim:
+    if: contains(github.event.issue.labels.*.name, 'identity-claim')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse and store identity claim
+        uses: actions/github-script@v7
+        id: claim
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const issue = context.payload.issue;
+            const body = issue.body || '';
+            const githubUser = issue.user.login;
+
+            function parseField(text, field) {
+              const regex = new RegExp(`### ${field}\\s*\\n\\s*(.+?)\\s*(?:\\n###|$)`, 's');
+              const match = text.match(regex);
+              return match ? match[1].trim() : '';
+            }
+
+            const displayName = parseField(body, 'Display Name');
+            const ethAddress = parseField(body, 'Ethereum Address');
+            const ethSig = parseField(body, 'Ethereum Signature \\(optional\\)');
+            const webId = parseField(body, 'Solid WebID');
+            const did = parseField(body, 'Decentralized Identifier \\(DID\\)');
+
+            if (!displayName) {
+              core.setFailed('Display name is required');
+              return;
+            }
+
+            // Validate Ethereum address format if provided
+            let ethVerified = false;
+            if (ethAddress && !/^0x[0-9a-fA-F]{40}$/.test(ethAddress)) {
+              core.warning(`Ethereum address "${ethAddress}" doesn't look valid (expected 0x + 40 hex chars). Storing as unverified.`);
+            }
+
+            // If signature provided, mark as pending verification
+            // (Full SIWE verification would require ethers.js — for now we store the sig)
+            if (ethSig && ethSig !== '_No response_' && ethSig.startsWith('0x')) {
+              core.info('Ethereum signature provided — stored for verification');
+            }
+
+            // Build author profile
+            const authorsDir = path.join('.verse', 'authors');
+            const profilePath = path.join(authorsDir, `${githubUser}.json`);
+
+            // Merge with existing profile if it exists
+            let existing = {};
+            if (fs.existsSync(profilePath)) {
+              existing = JSON.parse(fs.readFileSync(profilePath, 'utf-8'));
+            }
+
+            const profile = {
+              ...existing,
+              github: githubUser,
+              displayName: displayName,
+              updatedAt: new Date().toISOString(),
+              identities: {
+                github: {
+                  username: githubUser,
+                  verified: true,
+                  verifiedAt: new Date().toISOString(),
+                  method: 'github-issue-author',
+                },
+              },
+            };
+
+            if (ethAddress && ethAddress !== '_No response_') {
+              profile.identities.ethereum = {
+                address: ethAddress,
+                verified: ethVerified,
+                signature: (ethSig && ethSig !== '_No response_') ? ethSig : null,
+                claimedAt: new Date().toISOString(),
+              };
+            }
+
+            if (webId && webId !== '_No response_') {
+              profile.identities.webId = {
+                uri: webId,
+                verified: false,
+                claimedAt: new Date().toISOString(),
+              };
+            }
+
+            if (did && did !== '_No response_') {
+              profile.identities.did = {
+                uri: did,
+                verified: false,
+                claimedAt: new Date().toISOString(),
+              };
+            }
+
+            // Generate RDF
+            const rdfDir = path.join('.verse', 'authors', 'rdf');
+            if (!fs.existsSync(rdfDir)) fs.mkdirSync(rdfDir, { recursive: true });
+
+            let rdf = `@prefix verse: <https://ns.foxximediums.com/verse#> .
+            @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+            <github:${githubUser}> a verse:Author ;
+                rdfs:label "${displayName}"@en ;
+                foaf:account <https://github.com/${githubUser}> ;
+            `.replace(/^            /gm, '');
+
+            if (profile.identities.ethereum) {
+              rdf += `    verse:ethereumAddress "${profile.identities.ethereum.address}" ;\n`;
+            }
+            if (profile.identities.webId) {
+              rdf += `    verse:webId <${profile.identities.webId.uri}> ;\n`;
+            }
+            if (profile.identities.did) {
+              rdf += `    verse:did <${profile.identities.did.uri}> ;\n`;
+            }
+
+            // Close the last statement
+            rdf = rdf.replace(/ ;(\s*)$/, ' .$1');
+
+            fs.writeFileSync(profilePath, JSON.stringify(profile, null, 2));
+            fs.writeFileSync(path.join(rdfDir, `${githubUser}.ttl`), rdf);
+
+            // Retroactively link existing verses to this author profile
+            const nodesDir = path.join('.verse', 'nodes');
+            const nodeFiles = fs.readdirSync(nodesDir).filter(f => f.endsWith('.json'));
+            let linkedCount = 0;
+            for (const f of nodeFiles) {
+              const nodePath = path.join(nodesDir, f);
+              const node = JSON.parse(fs.readFileSync(nodePath, 'utf-8'));
+              if (node.githubAuthor === githubUser && !node.authorProfile) {
+                node.authorProfile = `authors/${githubUser}.json`;
+                fs.writeFileSync(nodePath, JSON.stringify(node, null, 2));
+                linkedCount++;
+              }
+            }
+
+            const identityList = Object.entries(profile.identities)
+              .map(([k, v]) => `| ${k} | ${v.uri || v.address || v.username} | ${v.verified ? 'Verified' : 'Claimed'} |`)
+              .join('\n');
+
+            core.setOutput('github_user', githubUser);
+            core.setOutput('display_name', displayName);
+            core.setOutput('identity_list', identityList);
+            core.setOutput('linked_count', linkedCount);
+
+      - name: Commit
+        run: |
+          git config user.name "verse-bot"
+          git config user.email "verse-bot@foxximediums.com"
+          git add .verse/
+          git commit -m "identity: link @${{ steps.claim.outputs.github_user }} (${{ steps.claim.outputs.display_name }})
+
+          Linked identities for ${{ steps.claim.outputs.display_name }}
+          Resolves #${{ github.event.issue.number }}"
+          git push
+
+      - name: Comment on issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const displayName = '${{ steps.claim.outputs.display_name }}';
+            const identityList = `${{ steps.claim.outputs.identity_list }}`;
+            const linkedCount = '${{ steps.claim.outputs.linked_count }}';
+
+            const comment = `## ☉ Identity Linked!
+
+            **${displayName}** — your identities have been registered in the Verse Protocol.
+
+            | System | Identifier | Status |
+            |---|---|---|
+            ${identityList}
+
+            ${linkedCount > 0 ? `\n${linkedCount} existing verse(s) retroactively linked to your profile.\n` : ''}
+            Your author profile: \`.verse/authors/${context.payload.issue.user.login}.json\`
+
+            > **Next steps:**
+            > - Ethereum address holders will receive $VERSE rewards at epoch snapshots
+            > - WebID links enable federated verse discovery via Solid pods
+            > - All your future verse contributions will be linked to this profile automatically
+            `.replace(/^            /gm, '');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: comment,
+            });
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              state: 'closed',
+              state_reason: 'completed',
+            });

@@ -98,6 +98,10 @@ jobs:
             const parentNodes = parents.map(p => nodes.find(n => n.id === p)).filter(Boolean);
             const maxDepth = Math.max(...parentNodes.map(n => n.depth || 0));
 
+            // Check for author profile
+            const authorProfilePath = path.join('.verse', 'authors', `${issue.user.login}.json`);
+            const hasProfile = fs.existsSync(authorProfilePath);
+
             // Create node
             const node = {
               id: newId,
@@ -112,6 +116,7 @@ jobs:
               desc: desc,
               githubIssue: issue.number,
               githubAuthor: issue.user.login,
+              ...(hasProfile ? { authorProfile: `authors/${issue.user.login}.json` } : {}),
             };
 
             // Write node

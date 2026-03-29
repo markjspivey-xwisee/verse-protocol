@@ -1,0 +1,59 @@
+name: "◇ Extend a Verse"
+description: "Add new narrative structure to an existing verse (character, location, system, etc.)"
+title: "[Extend] "
+labels: ["verse-proposal", "extend"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Propose a Verse Extension
+        Extend an existing narrative object without contradicting it. Your contribution will be attributed to you and scored by the Proof of Creativity engine.
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: "What is this narrative object called?"
+      placeholder: "e.g., The Ember Cartographer"
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      description: "What kind of narrative object is this?"
+      options:
+        - Verse
+        - Character
+        - Location
+        - System
+        - Event
+        - Artifact
+        - Faction
+        - Timeline
+        - World
+    validations:
+      required: true
+  - type: input
+    id: parent
+    attributes:
+      label: Parent ID
+      description: "Which existing verse does this extend? (Check the [DAG explorer](https://yellow-moss-0809fe90f.2.azurestaticapps.net) or run `verse status`)"
+      placeholder: "e.g., v2"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: "Describe this narrative object — its role, lore, significance in the world."
+      placeholder: "A cartographer who maps the world by setting controlled fires and reading the smoke patterns..."
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Author Name
+      description: "How should you be credited?"
+      placeholder: "Your name or handle"
+    validations:
+      required: true

@@ -1,13 +1,28 @@
 {
-  "name": "@verse-protocol/cli",
+  "name": "verse-protocol",
   "version": "0.1.0",
-  "description": "CLI for Verse Protocol — init, fork, extend, score verse repos",
+  "description": "Proof of Creativity — CLI for decentralized multiverse world-building. Init, extend, fork, merge, and score narrative DAGs.",
   "type": "module",
   "bin": {
     "verse": "./bin/verse.js"
   },
-  "dependencies": {
-    "@verse-protocol/core": "*"
+  "files": [
+    "bin/",
+    "lib/"
+  ],
+  "keywords": [
+    "worldbuilding",
+    "narrative",
+    "decentralized",
+    "rdf",
+    "dag",
+    "proof-of-creativity",
+    "multiverse"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markjspivey-xwisee/verse-protocol"
   },
+  "author": "Mark Spivey / Foxxi Mediums Inc.",
   "license": "CC-BY-4.0"
 }

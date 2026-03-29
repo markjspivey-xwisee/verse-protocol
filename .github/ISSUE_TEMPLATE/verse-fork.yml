@@ -1,0 +1,57 @@
+name: "⚡ Fork a Verse"
+description: "Create a divergent branch — take elements from an existing verse but modify or contradict its canon"
+title: "[Fork] "
+labels: ["verse-proposal", "fork"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Propose a Verse Fork
+        A fork diverges from existing canon — you take elements from a verse but reinterpret or contradict them. Both branches persist; the influence score determines which becomes de facto canon through downstream adoption.
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: "What is this fork called?"
+      placeholder: "e.g., Dark Ashenmere"
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - World
+        - Verse
+        - Character
+        - Location
+        - System
+        - Event
+        - Artifact
+        - Faction
+        - Timeline
+    validations:
+      required: true
+  - type: input
+    id: parent
+    attributes:
+      label: Parent ID
+      description: "Which existing verse does this fork from?"
+      placeholder: "e.g., v1"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: "What's different? How does this diverge from the parent?"
+      placeholder: "In this timeline, the Archivist burned the last book and language itself collapsed..."
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Author Name
+      placeholder: "Your name or handle"
+    validations:
+      required: true

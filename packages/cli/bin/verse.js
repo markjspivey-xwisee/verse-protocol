@@ -16,7 +16,16 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
 import { join, resolve } from 'path';
 import { execSync } from 'child_process';
-import { computeInfluence, buildMerkleRoot, NARRATIVE_TYPES, RELATION_TYPES, generateContextRDF } from '@verse-protocol/core';
+// Try workspace import first, fall back to bundled lib for npx/standalone use
+let core;
+try {
+  core = await import('@verse-protocol/core');
+} catch {
+  const influence = await import('../lib/influence.js');
+  const schema = await import('../lib/schema.js');
+  core = { ...influence, ...schema };
+}
+const { computeInfluence, buildMerkleRoot, NARRATIVE_TYPES, RELATION_TYPES, generateContextRDF } = core;
 
 const args = process.argv.slice(2);
 const cmd = args[0];

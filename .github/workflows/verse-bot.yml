@@ -1,0 +1,221 @@
+name: Verse Bot
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  process-verse-proposal:
+    if: contains(github.event.issue.labels.*.name, 'verse-proposal')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - name: Parse issue and create verse
+        uses: actions/github-script@v7
+        id: create-verse
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const issue = context.payload.issue;
+            const body = issue.body || '';
+            const labels = issue.labels.map(l => l.name);
+
+            // Determine relation type from labels
+            let relation = 'extends';
+            if (labels.includes('fork')) relation = 'forks';
+            if (labels.includes('merge')) relation = 'merges';
+
+            // Parse structured issue body fields
+            function parseField(text, field) {
+              const regex = new RegExp(`### ${field}\\s*\\n\\s*(.+?)\\s*(?:\\n###|$)`, 's');
+              const match = text.match(regex);
+              return match ? match[1].trim() : '';
+            }
+
+            const name = parseField(body, 'Name');
+            const type = parseField(body, 'Type') || 'Verse';
+            const desc = parseField(body, 'Description');
+            const author = parseField(body, 'Author Name') || issue.user.login;
+
+            if (!name) {
+              core.setFailed('Could not parse verse name from issue body');
+              return;
+            }
+
+            // Load existing nodes
+            const nodesDir = path.join('.verse', 'nodes');
+            const nodeFiles = fs.readdirSync(nodesDir).filter(f => f.endsWith('.json'));
+            const nodes = nodeFiles.map(f => JSON.parse(fs.readFileSync(path.join(nodesDir, f), 'utf-8')));
+
+            // Next ID
+            const maxId = nodes.reduce((m, n) => {
+              const num = parseInt(n.id.replace('v', ''), 10);
+              return num > m ? num : m;
+            }, 0);
+            const newId = `v${maxId + 1}`;
+
+            // Parse parent(s)
+            let parents;
+            if (relation === 'merges') {
+              const parentsRaw = parseField(body, 'Parent IDs');
+              parents = parentsRaw.split(/[,\s]+/).map(p => p.trim()).filter(p => p.startsWith('v'));
+              if (parents.length < 2) {
+                core.setFailed(`Merge requires at least 2 parents, got: ${parentsRaw}`);
+                return;
+              }
+            } else {
+              const parentRaw = parseField(body, 'Parent ID');
+              parents = [parentRaw.trim()];
+            }
+
+            // Validate parents exist
+            const nodeIds = new Set(nodes.map(n => n.id));
+            for (const p of parents) {
+              if (!nodeIds.has(p)) {
+                core.setFailed(`Parent "${p}" not found. Available: ${[...nodeIds].join(', ')}`);
+                return;
+              }
+            }
+
+            // Read manifest for epoch
+            const manifest = JSON.parse(fs.readFileSync(path.join('.verse', 'manifest.json'), 'utf-8'));
+            const newEpoch = (manifest.epoch || 0) + 1;
+
+            // Compute depth
+            const parentNodes = parents.map(p => nodes.find(n => n.id === p)).filter(Boolean);
+            const maxDepth = Math.max(...parentNodes.map(n => n.depth || 0));
+
+            // Create node
+            const node = {
+              id: newId,
+              type: type,
+              label: name,
+              author: author,
+              depth: maxDepth + 1,
+              epoch: newEpoch,
+              parents: parents,
+              relation: relation,
+              created: new Date().toISOString(),
+              desc: desc,
+              githubIssue: issue.number,
+              githubAuthor: issue.user.login,
+            };
+
+            // Write node
+            fs.writeFileSync(
+              path.join(nodesDir, `${newId}.json`),
+              JSON.stringify(node, null, 2)
+            );
+
+            // Write RDF
+            const rdfDir = path.join('.verse', 'rdf');
+            const parentTriples = parents.map(p => `    verse:${relation} <${p}> ;`).join('\n');
+            const rdf = `@prefix verse: <https://ns.foxximediums.com/verse#> .
+            @prefix dcterms: <http://purl.org/dc/terms/> .
+            @prefix prov: <http://www.w3.org/ns/prov#> .
+
+            <${newId}> a verse:${type} ;
+                rdfs:label "${name}"@en ;
+                rdfs:comment """${desc}"""@en ;
+                verse:authoredBy <github:${issue.user.login}> ;
+            ${parentTriples.replace(/ ;$/, ' .')}
+            `.replace(/^            /gm, '');
+            fs.writeFileSync(path.join(rdfDir, `${newId}.ttl`), rdf);
+
+            // Update manifest
+            manifest.epoch = newEpoch;
+            fs.writeFileSync(
+              path.join('.verse', 'manifest.json'),
+              JSON.stringify(manifest, null, 2)
+            );
+
+            // Output for next steps
+            core.setOutput('node_id', newId);
+            core.setOutput('name', name);
+            core.setOutput('type', type);
+            core.setOutput('relation', relation);
+            core.setOutput('parents', parents.join(', '));
+            core.setOutput('author', author);
+            core.setOutput('epoch', newEpoch);
+            core.setOutput('issue_number', issue.number);
+
+      - name: Run influence scoring
+        run: node packages/cli/bin/verse.js score 2>&1 || true
+
+      - name: Commit and push
+        run: |
+          git config user.name "verse-bot"
+          git config user.email "verse-bot@foxximediums.com"
+          git add .verse/
+          git commit -m "verse(${{ steps.create-verse.outputs.relation }}): ${{ steps.create-verse.outputs.name }} (${{ steps.create-verse.outputs.node_id }})
+
+          ${{ steps.create-verse.outputs.type }} — ${{ steps.create-verse.outputs.relation }} from ${{ steps.create-verse.outputs.parents }}
+          Author: ${{ steps.create-verse.outputs.author }}
+          Epoch: ${{ steps.create-verse.outputs.epoch }}
+          Resolves #${{ steps.create-verse.outputs.issue_number }}"
+          git push
+
+      - name: Comment on issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const nodeId = '${{ steps.create-verse.outputs.node_id }}';
+            const name = '${{ steps.create-verse.outputs.name }}';
+            const type = '${{ steps.create-verse.outputs.type }}';
+            const relation = '${{ steps.create-verse.outputs.relation }}';
+            const parents = '${{ steps.create-verse.outputs.parents }}';
+            const epoch = '${{ steps.create-verse.outputs.epoch }}';
+            const author = '${{ steps.create-verse.outputs.author }}';
+
+            const icons = {
+              World: '◆', Verse: '◇', Character: '☉', Location: '◈',
+              System: '⚙', Event: '⚡', Artifact: '✦', Faction: '⛊', Timeline: '↦'
+            };
+            const icon = icons[type] || '●';
+
+            const comment = `## ${icon} Verse Created!
+
+            | Field | Value |
+            |---|---|
+            | **ID** | \`${nodeId}\` |
+            | **Name** | ${name} |
+            | **Type** | ${type} |
+            | **Relation** | ${relation} |
+            | **Parents** | ${parents} |
+            | **Author** | @${context.payload.issue.user.login} (${author}) |
+            | **Epoch** | ${epoch} |
+
+            Your verse has been added to the multiverse DAG and influence scores have been recomputed.
+
+            **[View it in the Explorer →](https://yellow-moss-0809fe90f.2.azurestaticapps.net)**
+
+            > Other authors can now \`extend\`, \`fork\`, or \`merge\` your verse by referencing \`${nodeId}\` as a parent.
+            `.replace(/^            /gm, '');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: comment,
+            });
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              state: 'closed',
+              state_reason: 'completed',
+            });

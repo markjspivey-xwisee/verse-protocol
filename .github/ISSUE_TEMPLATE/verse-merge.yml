@@ -1,0 +1,41 @@
+name: "◈ Merge Verses"
+description: "Synthesize multiple narrative threads into a unified verse — the highest-creativity move"
+title: "[Merge] "
+labels: ["verse-proposal", "merge"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Propose a Verse Merge
+        Merges synthesize multiple sources into something new. High merge centrality is one of the strongest signals in the Proof of Creativity scoring — it means you created connective tissue between independent narratives.
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: "What is this merged verse called?"
+      placeholder: "e.g., Ash on Glass"
+    validations:
+      required: true
+  - type: input
+    id: parents
+    attributes:
+      label: Parent IDs
+      description: "Which verses are being merged? (comma-separated, minimum 2)"
+      placeholder: "e.g., v2, v9"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: "How do these threads combine? What new meaning emerges from the synthesis?"
+      placeholder: "Pyro-Linguistics meets Crystalline Memory — fire-words frozen in deep crystal, creating a new form of permanent language..."
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Author Name
+      placeholder: "Your name or handle"
+    validations:
+      required: true

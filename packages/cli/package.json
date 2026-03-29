@@ -1,0 +1,13 @@
+{
+  "name": "@verse-protocol/cli",
+  "version": "0.1.0",
+  "description": "CLI for Verse Protocol — init, fork, extend, score verse repos",
+  "type": "module",
+  "bin": {
+    "verse": "./bin/verse.js"
+  },
+  "dependencies": {
+    "@verse-protocol/core": "*"
+  },
+  "license": "CC-BY-4.0"
+}

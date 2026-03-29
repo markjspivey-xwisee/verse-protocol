@@ -1,0 +1,13 @@
+{
+  "name": "@verse-protocol/core",
+  "version": "0.1.0",
+  "description": "Influence scoring engine and shared types for Verse Protocol",
+  "main": "src/index.js",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./influence": "./src/influence.js",
+    "./schema": "./src/schema.js"
+  },
+  "license": "CC-BY-4.0"
+}

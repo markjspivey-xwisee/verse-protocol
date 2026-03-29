@@ -1,0 +1,16 @@
+{
+  "name": "verse-protocol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Proof of Creativity — Decentralized Multiverse World-Building Protocol",
+  "author": "Mark Spivey / Foxxi Mediums Inc.",
+  "license": "CC-BY-4.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=packages/web",
+    "build": "npm run build --workspace=packages/core && npm run build --workspace=packages/cli && npm run build --workspace=packages/web",
+    "verse": "node packages/cli/bin/verse.js"
+  }
+}

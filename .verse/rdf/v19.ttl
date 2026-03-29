@@ -1,0 +1,9 @@
+@prefix verse: <https://ns.foxximediums.com/verse#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<v19> a verse:Faction ;
+    rdfs:label "The Ash Weavers"@en ;
+    rdfs:comment """A secret guild that operates within the Cinder Library. While the Archivist reads ash, the Weavers reassemble it — literally weaving burned fragments into new texts that never existed. They believe all possible books already exist as potential patterns in ash, and their role is to find and reconstruct them. Controversial within Ashenmere because their "found texts" sometimes contradict established pyro-linguistic grammar."""@en ;
+    verse:authoredBy <github:markjspivey-xwisee> ;
+    verse:extends <v4> .

@@ -1,0 +1,16 @@
+{
+  "id": "v19",
+  "type": "Faction",
+  "label": "The Ash Weavers",
+  "author": "verse-bot-test",
+  "depth": 2,
+  "epoch": 18,
+  "parents": [
+    "v4"
+  ],
+  "relation": "extends",
+  "created": "2026-03-29T13:27:06.844Z",
+  "desc": "A secret guild that operates within the Cinder Library. While the Archivist reads ash, the Weavers reassemble it — literally weaving burned fragments into new texts that never existed. They believe all possible books already exist as potential patterns in ash, and their role is to find and reconstruct them. Controversial within Ashenmere because their \"found texts\" sometimes contradict established pyro-linguistic grammar.",
+  "githubIssue": 1,
+  "githubAuthor": "markjspivey-xwisee"
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { computeInfluence, computeAuthorStats, TYPE_ICONS, RELATION_COLORS } from '@verse-protocol/core';
-import { AUTHORS, SEED_NODES } from './data/seed.js';
+import { AUTHORS, SEED_NODES, CONTENT } from './data/seed.js';
 
 // --- LAYOUT ENGINE ---
 function layoutDAG(nodes, W = 1200, H = 900) {
@@ -48,6 +48,7 @@ export default function MultiverseExplorer() {
   const [selected, setSelected] = useState(null);
   const [hoveredNode, setHoveredNode] = useState(null);
   const [view, setView] = useState('dag');
+  const [showContent, setShowContent] = useState(false);
   const canvasRef = useRef(null);
 
   const scores = useMemo(() => computeInfluence(nodes), [nodes]);
@@ -189,7 +190,7 @@ export default function MultiverseExplorer() {
 
                 return (
                   <div key={n.id}
-                    onClick={() => setSelected(isSelected ? null : n.id)}
+                    onClick={() => { setSelected(isSelected ? null : n.id); setShowContent(false); }}
                     onMouseEnter={() => setHoveredNode(n.id)}
                     onMouseLeave={() => setHoveredNode(null)}
                     style={{
@@ -459,6 +460,48 @@ export default function MultiverseExplorer() {
             <p style={{ fontSize: 12, color: '#8a829e', lineHeight: 1.6, margin: '0 0 20px' }}>
               {selectedNode.desc}
             </p>
+
+            {/* Full content toggle */}
+            {CONTENT[selectedNode.id] && (() => {
+              const md = CONTENT[selectedNode.id];
+              const renderContent = (text) => {
+                return text.split('\n').map((line, i) => {
+                  if (line.startsWith('# ')) return null;
+                  if (line.startsWith('## ')) return <div key={i} style={{ fontSize: 12, fontWeight: 700, color: '#c8b6ff', marginTop: 16, marginBottom: 6 }}>{line.replace('## ', '')}</div>;
+                  if (line.startsWith('### ')) return <div key={i} style={{ fontSize: 11, fontWeight: 700, color: '#a098b4', marginTop: 12, marginBottom: 4 }}>{line.replace('### ', '')}</div>;
+                  if (line.startsWith('- **')) return <div key={i} style={{ fontSize: 11, color: '#8a829e', lineHeight: 1.6, paddingLeft: 12 }} dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.+?)\*\*/g, '<strong style="color:#e8e4f0">$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/^- /, '\u2022 ') }} />;
+                  if (line.startsWith('- ')) return <div key={i} style={{ fontSize: 11, color: '#8a829e', lineHeight: 1.6, paddingLeft: 12 }}>{'\u2022 '}{line.slice(2)}</div>;
+                  if (line.startsWith('|') && line.includes('---|')) return null;
+                  if (line.startsWith('|')) return <div key={i} style={{ fontSize: 10, color: '#665f7a', lineHeight: 1.8, fontFamily: 'monospace' }}>{line}</div>;
+                  if (line.startsWith('---')) return null;
+                  if (line.startsWith('**') && line.endsWith('**')) return <div key={i} style={{ fontSize: 11, color: '#a098b4', lineHeight: 1.6, marginTop: 4 }}><strong>{line.replace(/\*\*/g, '')}</strong></div>;
+                  if (line.trim() === '') return <div key={i} style={{ height: 8 }} />;
+                  return <div key={i} style={{ fontSize: 11, color: '#8a829e', lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.+?)\*\*/g, '<strong style="color:#e8e4f0">$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>') }} />;
+                });
+              };
+              return (
+                <div style={{ marginBottom: 16 }}>
+                  <button onClick={() => setShowContent(!showContent)} style={{
+                    background: 'rgba(200,182,255,0.08)', border: '1px solid rgba(200,182,255,0.2)',
+                    borderRadius: 4, padding: '6px 14px', cursor: 'pointer',
+                    color: '#c8b6ff', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase',
+                    fontFamily: 'inherit', width: '100%', textAlign: 'left',
+                  }}>
+                    {showContent ? '\u25BC' : '\u25B6'} Full Lore
+                  </button>
+                  {showContent && (
+                    <div style={{
+                      marginTop: 8, padding: '12px 14px',
+                      background: 'rgba(255,255,255,0.02)', borderRadius: 4,
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      maxHeight: 400, overflowY: 'auto',
+                    }}>
+                      {renderContent(md)}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 11 }}>
               <div style={{

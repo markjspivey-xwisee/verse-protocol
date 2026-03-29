@@ -12,5 +12,5 @@
   "created": "2026-03-29T13:03:26.255Z",
   "commitHash": "7bf018adbee3e551403f278b8d3df991e9a32030",
   "branch": "master",
-  "desc": "Extension of Ashenmere."
+  "desc": "Magic system where burning materials produces semantic meaning. Grammar encoded in flame color, materials determine semantic type."
 }

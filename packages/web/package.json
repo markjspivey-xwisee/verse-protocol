@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "generate-seed": "node scripts/generate-seed.js",
+    "dev": "node scripts/generate-seed.js && vite",
+    "build": "node scripts/generate-seed.js && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

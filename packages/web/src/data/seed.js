@@ -1,91 +1,272 @@
 /**
- * Seed data — the Ashenmere × Glassdeep sample multiverse.
- * Demonstrates every relation type, cross-world composition,
- * agent authorship, and how scoring rewards connective creativity.
+ * Auto-generated from .verse/ data — do not edit manually.
+ * Generated at: 2026-03-29T18:27:39.933Z
+ * Nodes: 19
+ * Authors: 2
  */
 
 export const AUTHORS = {
-  a1: { name: 'Kael', color: '#ff6b35', eth: '0x1a2b...3c4d' },
-  a2: { name: 'Lyra', color: '#00d4aa', eth: '0x5e6f...7g8h' },
-  a3: { name: 'Thorne', color: '#7b68ee', eth: '0x9i0j...1k2l' },
-  a4: { name: 'Sable', color: '#ff4081', eth: '0x3m4n...5o6p' },
-  a5: { name: 'Agent:Claude', color: '#c8b6ff', eth: '—', isAgent: true, director: 'a1' },
+  "markj": {
+    "name": "markj",
+    "color": "#ff6b35",
+    "eth": "—"
+  },
+  "markjspivey-xwisee": {
+    "name": "verse-bot-test",
+    "color": "#00d4aa",
+    "eth": "—"
+  }
 };
 
 export const SEED_NODES = [
   {
-    id: 'v1', type: 'World', label: 'Ashenmere', author: 'a1',
-    depth: 0, epoch: 1,
-    desc: 'A world where fire is memory and ash is language. The first System: pyro-linguistics.',
+    "id": "v1",
+    "type": "World",
+    "label": "Ashenmere",
+    "author": "markj",
+    "depth": 0,
+    "epoch": 1,
+    "desc": "Root world for Ashenmere."
   },
   {
-    id: 'v2', type: 'System', label: 'Pyro-Linguistics', author: 'a1',
-    depth: 1, epoch: 1, parents: ['v1'], relation: 'extends',
-    desc: 'Magic system where burning materials produces semantic meaning. Grammar encoded in flame color.',
+    "id": "v2",
+    "type": "System",
+    "label": "Pyro-Linguistics",
+    "author": "markj",
+    "depth": 1,
+    "epoch": 1,
+    "desc": "Extension of Ashenmere.",
+    "parents": [
+      "v1"
+    ],
+    "relation": "extends"
   },
   {
-    id: 'v3', type: 'Character', label: 'The Archivist', author: 'a2',
-    depth: 1, epoch: 2, parents: ['v1'], relation: 'extends',
-    desc: 'A mute librarian who reads the ash of burned books. First character to inhabit Ashenmere.',
+    "id": "v3",
+    "type": "Character",
+    "label": "The Archivist",
+    "author": "markj",
+    "depth": 1,
+    "epoch": 2,
+    "desc": "Extension of Ashenmere.",
+    "parents": [
+      "v1"
+    ],
+    "relation": "extends"
   },
   {
-    id: 'v4', type: 'Location', label: 'The Cinder Library', author: 'a2',
-    depth: 2, epoch: 2, parents: ['v1', 'v3'], relation: 'extends',
-    desc: 'A library where books are burned to be read. The ash patterns on the walls are the catalog.',
+    "id": "v4",
+    "type": "Location",
+    "label": "The Cinder Library",
+    "author": "markj",
+    "depth": 1,
+    "epoch": 3,
+    "desc": "Extension of Ashenmere.",
+    "parents": [
+      "v1"
+    ],
+    "relation": "extends"
   },
   {
-    id: 'v5', type: 'Verse', label: 'The First Burning', author: 'a1',
-    depth: 2, epoch: 3, parents: ['v2', 'v3'], relation: 'merges',
-    desc: 'The Archivist discovers that Pyro-Linguistics can resurrect destroyed texts. Merge of System + Character.',
+    "id": "v5",
+    "type": "Artifact",
+    "label": "Flame Grammar",
+    "author": "markj",
+    "depth": 2,
+    "epoch": 4,
+    "desc": "Extension of Pyro-Linguistics.",
+    "parents": [
+      "v2"
+    ],
+    "relation": "extends"
   },
   {
-    id: 'v6', type: 'World', label: 'Glassdeep', author: 'a3',
-    depth: 0, epoch: 3,
-    desc: 'An ocean world where water solidifies into crystal at depth. Separate universe, independent creation.',
+    "id": "v6",
+    "type": "Verse",
+    "label": "The First Burning",
+    "author": "markj",
+    "depth": 2,
+    "epoch": 5,
+    "desc": "Merge of v2, v3.",
+    "parents": [
+      "v2",
+      "v3"
+    ],
+    "relation": "merges"
   },
   {
-    id: 'v7', type: 'System', label: 'Crystalline Memory', author: 'a3',
-    depth: 1, epoch: 4, parents: ['v6'], relation: 'extends',
-    desc: 'Water remembers. Deep-crystal formations are compressed memories of ancient seas.',
+    "id": "v7",
+    "type": "Verse",
+    "label": "Resurrection Syntax",
+    "author": "markj",
+    "depth": 3,
+    "epoch": 6,
+    "desc": "Extension of The First Burning.",
+    "parents": [
+      "v6"
+    ],
+    "relation": "extends"
   },
   {
-    id: 'v8', type: 'Verse', label: 'Ash on Glass', author: 'a4',
-    depth: 3, epoch: 5, parents: ['v2', 'v7'], relation: 'merges',
-    desc: 'A crossover: Pyro-Linguistics meets Crystalline Memory. Fire-words frozen in deep crystal.',
+    "id": "v8",
+    "type": "World",
+    "label": "Glassdeep",
+    "author": "markj",
+    "depth": 1,
+    "epoch": 7,
+    "desc": "Fork of Ashenmere.",
+    "parents": [
+      "v1"
+    ],
+    "relation": "forks"
   },
   {
-    id: 'v9', type: 'Character', label: 'The Glassburner', author: 'a4',
-    depth: 4, epoch: 5, parents: ['v8', 'v3'], relation: 'extends',
-    desc: "Born from the merge — speaks fire into crystal. Redefines The Archivist's role.",
+    "id": "v9",
+    "type": "System",
+    "label": "Crystalline Memory",
+    "author": "markj",
+    "depth": 2,
+    "epoch": 8,
+    "desc": "Extension of Glassdeep.",
+    "parents": [
+      "v8"
+    ],
+    "relation": "extends"
   },
   {
-    id: 'v10', type: 'Event', label: 'The Semiotic Fracture', author: 'a3',
-    depth: 4, epoch: 6, parents: ['v8'], relation: 'forks',
-    desc: 'What if the merge went wrong? Crystal shatters meaning instead of preserving it. Fork of Ash on Glass.',
+    "id": "v10",
+    "type": "Faction",
+    "label": "The Depth Singers",
+    "author": "markj",
+    "depth": 2,
+    "epoch": 9,
+    "desc": "Extension of Glassdeep.",
+    "parents": [
+      "v8"
+    ],
+    "relation": "extends"
   },
   {
-    id: 'v11', type: 'Verse', label: 'Ember Cartography', author: 'a5',
-    depth: 3, epoch: 6, parents: ['v2', 'v4'], relation: 'extends',
-    desc: 'Agent-authored: maps of Ashenmere drawn in controlled burns. Directed by Kael.',
+    "id": "v11",
+    "type": "Verse",
+    "label": "Ash on Glass",
+    "author": "markj",
+    "depth": 3,
+    "epoch": 10,
+    "desc": "Merge of v2, v9.",
+    "parents": [
+      "v2",
+      "v9"
+    ],
+    "relation": "merges"
   },
   {
-    id: 'v12', type: 'Verse', label: 'The Deep Catalog', author: 'a2',
-    depth: 5, epoch: 7, parents: ['v4', 'v7', 'v9'], relation: 'merges',
-    desc: 'Lyra synthesizes three threads — Library + Crystal Memory + Glassburner. High merge centrality.',
+    "id": "v12",
+    "type": "Character",
+    "label": "The Glassburner",
+    "author": "markj",
+    "depth": 4,
+    "epoch": 11,
+    "desc": "Extension of Ash on Glass.",
+    "parents": [
+      "v11"
+    ],
+    "relation": "extends"
   },
   {
-    id: 'v13', type: 'Faction', label: 'Order of Cinders', author: 'a1',
-    depth: 3, epoch: 7, parents: ['v5', 'v2'], relation: 'extends',
-    desc: 'A faction of pyro-linguists who guard the grammar of flame. Political layer.',
+    "id": "v13",
+    "type": "Event",
+    "label": "The Semiotic Fracture",
+    "author": "markj",
+    "depth": 4,
+    "epoch": 12,
+    "desc": "Fork of Ash on Glass.",
+    "parents": [
+      "v11"
+    ],
+    "relation": "forks"
   },
   {
-    id: 'v14', type: 'Verse', label: 'Silent Flame', author: 'a4',
-    depth: 5, epoch: 8, parents: ['v10', 'v13'], relation: 'merges',
-    desc: 'The Fracture meets the Order. What happens when the guardians face meaningless fire?',
+    "id": "v14",
+    "type": "Faction",
+    "label": "Order of Cinders",
+    "author": "markj",
+    "depth": 3,
+    "epoch": 13,
+    "desc": "Extension of The First Burning.",
+    "parents": [
+      "v6"
+    ],
+    "relation": "extends"
   },
   {
-    id: 'v15', type: 'World', label: 'Ashenmere Reforged', author: 'a2',
-    depth: 6, epoch: 8, parents: ['v12', 'v14'], relation: 'redefines',
-    desc: 'Lyra redefines the entire world. Ash is no longer language — it is silence. Interpretant shift.',
+    "id": "v15",
+    "type": "Verse",
+    "label": "The Deep Catalog",
+    "author": "markj",
+    "depth": 5,
+    "epoch": 14,
+    "desc": "Merge of v4, v9, v12.",
+    "parents": [
+      "v4",
+      "v9",
+      "v12"
+    ],
+    "relation": "merges"
   },
+  {
+    "id": "v16",
+    "type": "Verse",
+    "label": "Silent Flame",
+    "author": "markj",
+    "depth": 5,
+    "epoch": 15,
+    "desc": "Merge of v13, v14.",
+    "parents": [
+      "v13",
+      "v14"
+    ],
+    "relation": "merges"
+  },
+  {
+    "id": "v17",
+    "type": "Artifact",
+    "label": "The Unburnable Word",
+    "author": "markj",
+    "depth": 6,
+    "epoch": 16,
+    "desc": "Extension of The Deep Catalog.",
+    "parents": [
+      "v15"
+    ],
+    "relation": "extends"
+  },
+  {
+    "id": "v18",
+    "type": "Verse",
+    "label": "Ashenmere Reforged",
+    "author": "markj",
+    "depth": 7,
+    "epoch": 17,
+    "desc": "Merge of v16, v17, v7.",
+    "parents": [
+      "v16",
+      "v17",
+      "v7"
+    ],
+    "relation": "merges"
+  },
+  {
+    "id": "v19",
+    "type": "Faction",
+    "label": "The Ash Weavers",
+    "author": "markjspivey-xwisee",
+    "depth": 2,
+    "epoch": 18,
+    "desc": "A secret guild that operates within the Cinder Library. While the Archivist reads ash, the Weavers reassemble it — literally weaving burned fragments into new texts that never existed. They believe all possible books already exist as potential patterns in ash, and their role is to find and reconstruct them. Controversial within Ashenmere because their \"found texts\" sometimes contradict established pyro-linguistic grammar.",
+    "parents": [
+      "v4"
+    ],
+    "relation": "extends"
+  }
 ];

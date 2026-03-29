@@ -1,0 +1,15 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html"
+  },
+  "mimeTypes": {
+    ".js": "text/javascript",
+    ".mjs": "text/javascript",
+    ".json": "application/json",
+    ".css": "text/css",
+    ".html": "text/html",
+    ".svg": "image/svg+xml",
+    ".wasm": "application/wasm",
+    ".ttl": "text/turtle"
+  }
+}

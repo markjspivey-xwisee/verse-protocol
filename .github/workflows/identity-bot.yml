@@ -110,12 +110,14 @@ jobs:
             const rdfDir = path.join('.verse', 'authors', 'rdf');
             if (!fs.existsSync(rdfDir)) fs.mkdirSync(rdfDir, { recursive: true });
 
+            function escapeRdf(s) { return (s || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"'); }
+
             let rdf = `@prefix verse: <https://ns.foxximediums.com/verse#> .
             @prefix foaf: <http://xmlns.com/foaf/0.1/> .
             @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
             <github:${githubUser}> a verse:Author ;
-                rdfs:label "${displayName}"@en ;
+                rdfs:label "${escapeRdf(displayName)}"@en ;
                 foaf:account <https://github.com/${githubUser}> ;
             `.replace(/^            /gm, '');
 

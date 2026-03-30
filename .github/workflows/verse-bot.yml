@@ -128,13 +128,17 @@ jobs:
             // Write RDF
             const rdfDir = path.join('.verse', 'rdf');
             const parentTriples = parents.map(p => `    verse:${relation} <${p}> ;`).join('\n');
+            // Escape RDF string literals
+            function escapeRdf(s) { return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"'); }
+
             const rdf = `@prefix verse: <https://ns.foxximediums.com/verse#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
             @prefix dcterms: <http://purl.org/dc/terms/> .
             @prefix prov: <http://www.w3.org/ns/prov#> .
 
             <${newId}> a verse:${type} ;
-                rdfs:label "${name}"@en ;
-                rdfs:comment """${desc}"""@en ;
+                rdfs:label "${escapeRdf(name)}"@en ;
+                rdfs:comment """${escapeRdf(desc)}"""@en ;
                 verse:authoredBy <github:${issue.user.login}> ;
             ${parentTriples.replace(/ ;$/, ' .')}
             `.replace(/^            /gm, '');

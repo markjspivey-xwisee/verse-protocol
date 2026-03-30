@@ -72,17 +72,20 @@ export const AFFORDANCE_TYPES = [
 export function generateContextRDF(obj) {
   const id = obj.id || `verse:${obj.label?.replace(/\s+/g, '')}`;
   const type = obj.type || 'Verse';
+  function escapeRdf(s) { return (s || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"'); }
+
   const lines = [
     `@prefix verse: <${NAMESPACE}> .`,
+    `@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .`,
     `@prefix dcterms: <http://purl.org/dc/terms/> .`,
     `@prefix prov: <http://www.w3.org/ns/prov#> .`,
     ``,
     `<${id}> a verse:${type} ;`,
-    `    rdfs:label "${obj.label || 'Untitled'}"@en ;`,
+    `    rdfs:label "${escapeRdf(obj.label || 'Untitled')}"@en ;`,
   ];
 
   if (obj.description) {
-    lines.push(`    rdfs:comment """${obj.description}"""@en ;`);
+    lines.push(`    rdfs:comment """${escapeRdf(obj.description)}"""@en ;`);
   }
 
   if (obj.author) {

@@ -3,6 +3,8 @@ import { buildWorldGraph, detectAffordances, ROOM_TYPES, ENTITY_TYPES } from './
 import NodeRoom from './NodeRoom.jsx';
 import ProposalBuilder from './ProposalBuilder.jsx';
 import ActivityFeed from './ActivityFeed.jsx';
+import DungeonMaster from './DungeonMaster.jsx';
+import EpochReplay from './EpochReplay.jsx';
 import { usePresence } from './usePresence.js';
 
 const TYPE_ICONS = {
@@ -36,6 +38,8 @@ const AFFORDANCE_ICONS = {
 export default function WorldView({ nodes, scores, content, authors, selected, onSelectNode }) {
   const [currentId, setCurrentId] = useState(selected || nodes[0]?.id || 'v1');
   const [proposal, setProposal] = useState(null);
+  const [dmVisible, setDmVisible] = useState(false);
+  const [showReplay, setShowReplay] = useState(false);
 
   const graph = useMemo(() => buildWorldGraph(nodes), [nodes]);
   const affordances = useMemo(() => detectAffordances(nodes), [nodes]);
@@ -336,6 +340,28 @@ export default function WorldView({ nodes, scores, content, authors, selected, o
         >
           + Create Something Here
         </button>
+
+        {/* Epoch replay button */}
+        <button
+          onClick={() => setShowReplay(true)}
+          style={{
+            width: '100%', padding: '10px 16px', fontSize: 11, marginTop: 8,
+            background: 'rgba(200,182,255,0.06)', border: '1px solid rgba(200,182,255,0.15)',
+            borderRadius: 4, color: '#c8b6ff', cursor: 'pointer',
+            fontFamily: 'inherit', letterSpacing: '0.05em',
+            transition: 'all 0.2s',
+          }}
+          onMouseEnter={e => {
+            e.target.style.background = 'rgba(200,182,255,0.12)';
+            e.target.style.borderColor = 'rgba(200,182,255,0.3)';
+          }}
+          onMouseLeave={e => {
+            e.target.style.background = 'rgba(200,182,255,0.06)';
+            e.target.style.borderColor = 'rgba(200,182,255,0.15)';
+          }}
+        >
+          ◆ Watch World Grow
+        </button>
       </div>
 
       {/* Proposal modal */}
@@ -344,6 +370,23 @@ export default function WorldView({ nodes, scores, content, authors, selected, o
           affordance={proposal}
           parentNode={current}
           onClose={() => setProposal(null)}
+        />
+      )}
+
+      {/* Dungeon Master */}
+      <DungeonMaster
+        currentNode={current}
+        nodes={nodes}
+        content={content}
+        visible={dmVisible}
+        onToggle={() => setDmVisible(!dmVisible)}
+      />
+
+      {/* Epoch Replay */}
+      {showReplay && (
+        <EpochReplay
+          allNodes={nodes}
+          onClose={() => setShowReplay(false)}
         />
       )}
     </div>

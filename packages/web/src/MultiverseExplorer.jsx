@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { computeInfluence, computeAuthorStats, TYPE_ICONS, RELATION_COLORS } from '@verse-protocol/core';
 import { AUTHORS, SEED_NODES, CONTENT } from './data/seed.js';
+import WorldView from './game/WorldView.jsx';
 
 // --- LAYOUT ENGINE ---
 function layoutDAG(nodes, W = 1200, H = 900) {
@@ -151,7 +152,7 @@ export default function MultiverseExplorer() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 4 }}>
-          {['dag', 'scores', 'authors'].map(v => (
+          {['dag', 'scores', 'authors', 'world'].map(v => (
             <button key={v} onClick={() => setView(v)} style={{
               padding: '6px 16px', fontSize: 11, letterSpacing: '0.1em',
               textTransform: 'uppercase', cursor: 'pointer', border: '1px solid',
@@ -431,6 +432,18 @@ export default function MultiverseExplorer() {
                 Revenue share propagates backward through verse:reuses edges.
               </div>
             </div>
+          )}
+
+          {/* ============ WORLD VIEW ============ */}
+          {view === 'world' && (
+            <WorldView
+              nodes={nodes}
+              scores={scores}
+              content={CONTENT}
+              authors={AUTHORS}
+              selected={selected}
+              onSelectNode={(id) => setSelected(id)}
+            />
           )}
         </div>
 

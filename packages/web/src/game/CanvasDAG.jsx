@@ -11,7 +11,13 @@ import { computeInfluence, TYPE_ICONS, RELATION_COLORS } from '@verse-protocol/c
  */
 
 // --- Layout ---
-function layoutDAG(nodes, W, H) {
+// Lays out into a fixed "world space" large enough that nodes never overlap,
+// then we fit-zoom the camera to show everything.
+const WORLD_W = 2400;
+const WORLD_H = 1800;
+const NODE_SPACING_Y = 120; // Minimum vertical gap between nodes in same epoch
+
+function layoutDAG(nodes) {
   const epochGroups = {};
   nodes.forEach(n => {
     const e = n.epoch || 0;
@@ -20,19 +26,37 @@ function layoutDAG(nodes, W, H) {
   });
   const epochs = Object.keys(epochGroups).map(Number).sort((a, b) => a - b);
   const positions = {};
-  const pad = Math.min(60, W * 0.05);
+  const pad = 100;
 
   epochs.forEach((ep, ei) => {
     const group = epochGroups[ep];
-    const x = pad + (ei / Math.max(epochs.length - 1, 1)) * (W - pad * 2);
+    const x = pad + (ei / Math.max(epochs.length - 1, 1)) * (WORLD_W - pad * 2);
+    const totalSpread = group.length * NODE_SPACING_Y;
+    const yStart = (WORLD_H - totalSpread) / 2 + NODE_SPACING_Y / 2;
     group.forEach((id, gi) => {
-      const spread = Math.min(group.length * 90, H - pad * 2);
-      const yStart = (H - spread) / 2;
-      const y = yStart + (gi / Math.max(group.length - 1, 1)) * spread;
-      positions[id] = { x, y: group.length === 1 ? H / 2 : y };
+      const y = group.length === 1 ? WORLD_H / 2 : yStart + gi * NODE_SPACING_Y;
+      positions[id] = { x, y };
     });
   });
   return positions;
+}
+
+// Compute the zoom level that fits all nodes into the viewport with padding
+function fitZoom(positions, viewW, viewH) {
+  if (Object.keys(positions).length === 0) return { zoom: 1, cx: 0, cy: 0 };
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const { x, y } of Object.values(positions)) {
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
+  }
+  const contentW = maxX - minX + 200; // padding for node radius + labels
+  const contentH = maxY - minY + 200;
+  const zoom = Math.min(viewW / contentW, viewH / contentH, 1.5);
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+  return { zoom: Math.max(0.15, zoom), cx, cy };
 }
 
 function influenceColor(normalized) {
@@ -82,10 +106,24 @@ export default function CanvasDAG({ nodes, scores, authors, selected, onSelect, 
 
   // Pan/zoom state
   const [camera, setCamera] = useState({ x: 0, y: 0, zoom: 1 });
-  const dragRef = useRef({ dragging: false, lastX: 0, lastY: 0 });
+  const [hasAutoFit, setHasAutoFit] = useState(false);
+  const dragRef = useRef({ dragging: false, lastX: 0, lastY: 0, startX: 0, startY: 0 });
   const touchRef = useRef({ pinching: false, lastDist: 0 });
 
-  const positions = useMemo(() => layoutDAG(nodes, size.w * 1.2, size.h * 1.2), [nodes, size]);
+  const positions = useMemo(() => layoutDAG(nodes), [nodes]);
+
+  // Auto-fit camera when size is first known
+  useEffect(() => {
+    if (size.w > 100 && size.h > 100 && !hasAutoFit && Object.keys(positions).length > 0) {
+      const { zoom, cx, cy } = fitZoom(positions, size.w, size.h);
+      setCamera({
+        x: -(cx - WORLD_W / 2),
+        y: -(cy - WORLD_H / 2),
+        zoom,
+      });
+      setHasAutoFit(true);
+    }
+  }, [size, positions, hasAutoFit]);
 
   // Resize observer
   useEffect(() => {
@@ -110,11 +148,11 @@ export default function CanvasDAG({ nodes, scores, authors, selected, onSelect, 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, size.w, size.h);
 
-    // Apply camera transform
+    // Apply camera transform: center on world, then pan/zoom
     ctx.save();
     ctx.translate(size.w / 2, size.h / 2);
     ctx.scale(camera.zoom, camera.zoom);
-    ctx.translate(-size.w / 2 + camera.x, -size.h / 2 + camera.y);
+    ctx.translate(-WORLD_W / 2 + camera.x, -WORLD_H / 2 + camera.y);
 
     const labelFont = '9px "JetBrains Mono", monospace';
     const epochFont = '8px "JetBrains Mono", monospace';
@@ -251,7 +289,7 @@ export default function CanvasDAG({ nodes, scores, authors, selected, onSelect, 
       const ep = epochSet[i];
       const sampleNode = nodes.find(n => n.epoch === ep);
       if (sampleNode && positions[sampleNode.id]) {
-        ctx.fillText(`E${ep}`, positions[sampleNode.id].x, size.h * 1.15);
+        ctx.fillText(`E${ep}`, positions[sampleNode.id].x, WORLD_H - 20);
       }
     }
 
@@ -285,13 +323,13 @@ export default function CanvasDAG({ nodes, scores, authors, selected, onSelect, 
     if (!rect) return { x: 0, y: 0 };
     const sx = clientX - rect.left;
     const sy = clientY - rect.top;
-    const wx = (sx - size.w / 2) / camera.zoom + size.w / 2 - camera.x;
-    const wy = (sy - size.h / 2) / camera.zoom + size.h / 2 - camera.y;
+    const wx = (sx - size.w / 2) / camera.zoom + WORLD_W / 2 - camera.x;
+    const wy = (sy - size.h / 2) / camera.zoom + WORLD_H / 2 - camera.y;
     return { x: wx, y: wy };
   }, [camera, size]);
 
   const handleMouseDown = useCallback((e) => {
-    dragRef.current = { dragging: true, lastX: e.clientX, lastY: e.clientY };
+    dragRef.current = { dragging: true, lastX: e.clientX, lastY: e.clientY, startX: e.clientX, startY: e.clientY };
   }, []);
 
   const handleMouseMove = useCallback((e) => {
@@ -312,8 +350,8 @@ export default function CanvasDAG({ nodes, scores, authors, selected, onSelect, 
 
   const handleMouseUp = useCallback((e) => {
     if (dragRef.current.dragging) {
-      const moved = Math.abs(e.clientX - dragRef.current.lastX) + Math.abs(e.clientY - dragRef.current.lastY);
-      if (moved < 5) {
+      const moved = Math.abs(e.clientX - dragRef.current.startX) + Math.abs(e.clientY - dragRef.current.startY);
+      if (moved < 8) {
         // Click, not drag
         const { x, y } = toWorld(e.clientX, e.clientY);
         const hit = hitTest(x, y, nodes, positions, scores);

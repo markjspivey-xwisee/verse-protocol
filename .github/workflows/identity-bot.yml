@@ -15,6 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install ethers@6 --no-save
+
       - name: Parse and store identity claim
         uses: actions/github-script@v7
         id: claim
@@ -46,14 +52,28 @@ jobs:
 
             // Validate Ethereum address format if provided
             let ethVerified = false;
-            if (ethAddress && !/^0x[0-9a-fA-F]{40}$/.test(ethAddress)) {
+            if (ethAddress && ethAddress !== '_No response_' && !/^0x[0-9a-fA-F]{40}$/.test(ethAddress)) {
               core.warning(`Ethereum address "${ethAddress}" doesn't look valid (expected 0x + 40 hex chars). Storing as unverified.`);
             }
 
-            // If signature provided, mark as pending verification
-            // (Full SIWE verification would require ethers.js — for now we store the sig)
-            if (ethSig && ethSig !== '_No response_' && ethSig.startsWith('0x')) {
-              core.info('Ethereum signature provided — stored for verification');
+            // SIWE verification: verify the signature matches the claimed address
+            if (ethSig && ethSig !== '_No response_' && ethSig.startsWith('0x') &&
+                ethAddress && ethAddress !== '_No response_' && /^0x[0-9a-fA-F]{40}$/.test(ethAddress)) {
+              try {
+                const { ethers } = require('ethers');
+                const expectedMessage = `I am ${githubUser} on GitHub and I claim this address for Verse Protocol`;
+                const recovered = ethers.verifyMessage(expectedMessage, ethSig);
+                if (recovered.toLowerCase() === ethAddress.toLowerCase()) {
+                  ethVerified = true;
+                  core.info(`Ethereum address verified via SIWE signature for ${githubUser}`);
+                } else {
+                  core.warning(`Signature recovered address ${recovered} does not match claimed ${ethAddress}`);
+                }
+              } catch (e) {
+                core.warning(`SIWE verification failed: ${e.message}. Storing as unverified.`);
+              }
+            } else if (ethSig && ethSig !== '_No response_' && ethSig.startsWith('0x')) {
+              core.info('Ethereum signature provided but address missing or invalid — stored for manual verification');
             }
 
             // Build author profile

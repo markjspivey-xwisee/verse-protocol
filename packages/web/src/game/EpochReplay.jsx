@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { computeInfluence, TYPE_ICONS, RELATION_COLORS } from '@verse-protocol/core';
+import { prepareWithSegments, layoutWithLines } from '@chenglou/pretext';
 
 /**
  * Epoch Replay — watch the world grow epoch by epoch.
@@ -156,7 +157,18 @@ export default function EpochReplay({ allNodes, onClose }) {
       ctx.fillStyle = isNew ? '#e8e4f0' : '#665f7a';
       ctx.font = `${isNew ? '11' : '9'}px "JetBrains Mono", monospace`;
       ctx.textAlign = 'center';
-      ctx.fillText(n.label, pos.x, pos.y + size + 14);
+      // Use pretext for wrapped labels
+      try {
+        const labelFont = `${isNew ? '10' : '8'}px "JetBrains Mono", monospace`;
+        const prepared = prepareWithSegments(n.label, labelFont);
+        const laid = layoutWithLines(prepared, 80, 1.2);
+        ctx.font = labelFont;
+        laid.lines.forEach((line, li) => {
+          ctx.fillText(line.text, pos.x, pos.y + size + 14 + li * 11);
+        });
+      } catch {
+        ctx.fillText(n.label, pos.x, pos.y + size + 14);
+      }
     }
   }, [visibleNodes, positions, scores, newestNodes]);
 

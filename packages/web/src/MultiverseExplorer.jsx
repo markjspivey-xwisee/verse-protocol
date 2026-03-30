@@ -1,47 +1,16 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { computeInfluence, computeAuthorStats, TYPE_ICONS, RELATION_COLORS } from '@verse-protocol/core';
 import { AUTHORS, SEED_NODES, CONTENT } from './data/seed.js';
+import CanvasDAG from './game/CanvasDAG.jsx';
 import WorldView from './game/WorldView.jsx';
 import EconomyView from './game/EconomyView.jsx';
 
-// --- LAYOUT ENGINE ---
-function layoutDAG(nodes, W = 1200, H = 900) {
-  const epochGroups = {};
-  nodes.forEach(n => {
-    const e = n.epoch || 0;
-    if (!epochGroups[e]) epochGroups[e] = [];
-    epochGroups[e].push(n.id);
-  });
-
-  const epochs = Object.keys(epochGroups).map(Number).sort((a, b) => a - b);
-  const positions = {};
-
-  epochs.forEach((ep, ei) => {
-    const group = epochGroups[ep];
-    const x = 80 + (ei / Math.max(epochs.length - 1, 1)) * (W - 160);
-    group.forEach((id, gi) => {
-      const spread = Math.min(group.length * 110, H - 120);
-      const yStart = (H - spread) / 2;
-      const y = yStart + (gi / Math.max(group.length - 1, 1)) * spread;
-      positions[id] = { x, y: group.length === 1 ? H / 2 : y };
-    });
-  });
-
-  return positions;
-}
-
-// --- COLOR UTILS ---
+// Color util for scores/authors views
 function influenceColor(normalized) {
   const r = Math.round(40 + normalized * 215);
   const g = Math.round(20 + (1 - normalized) * 60 + normalized * 80);
   const b = Math.round(60 + (1 - normalized) * 140);
   return `rgb(${r},${g},${b})`;
-}
-
-function influenceGlow(normalized) {
-  if (normalized > 0.7) return `0 0 ${20 + normalized * 30}px rgba(255,100,50,${normalized * 0.6})`;
-  if (normalized > 0.3) return `0 0 ${10 + normalized * 15}px rgba(200,150,100,${normalized * 0.3})`;
-  return 'none';
 }
 
 // --- MAIN COMPONENT ---
@@ -51,81 +20,12 @@ export default function MultiverseExplorer() {
   const [hoveredNode, setHoveredNode] = useState(null);
   const [view, setView] = useState('dag');
   const [showContent, setShowContent] = useState(false);
-  const canvasRef = useRef(null);
-  const dagContainerRef = useRef(null);
-  const [dagSize, setDagSize] = useState({ w: 1200, h: 900 });
-
-  // Responsive DAG sizing
-  useEffect(() => {
-    function updateSize() {
-      if (dagContainerRef.current) {
-        const rect = dagContainerRef.current.getBoundingClientRect();
-        setDagSize({ w: Math.max(rect.width, 320), h: Math.max(rect.height, 400) });
-      }
-    }
-    updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
-  }, [view]);
 
   const scores = useMemo(() => computeInfluence(nodes), [nodes]);
-  const positions = useMemo(() => layoutDAG(nodes, dagSize.w, dagSize.h), [nodes, dagSize]);
 
   const selectedNode = nodes.find(n => n.id === selected);
   const hoveredData = nodes.find(n => n.id === hoveredNode);
 
-  // Canvas edge rendering
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
-    const W = dagSize.w;
-    const H = dagSize.h;
-    canvas.width = W * dpr;
-    canvas.height = H * dpr;
-    ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, W, H);
-
-    nodes.forEach(n => {
-      if (!n.parents) return;
-      n.parents.forEach(pid => {
-        const from = positions[pid];
-        const to = positions[n.id];
-        if (!from || !to) return;
-
-        const relColor = RELATION_COLORS[n.relation] || '#555';
-        const isHighlighted = selected === n.id || selected === pid;
-
-        ctx.beginPath();
-        ctx.strokeStyle = isHighlighted ? relColor : `${relColor}55`;
-        ctx.lineWidth = isHighlighted ? 2.5 : 1.2;
-
-        if (n.relation === 'merges') ctx.setLineDash([6, 4]);
-        else if (n.relation === 'forks') ctx.setLineDash([3, 3]);
-        else if (n.relation === 'redefines') ctx.setLineDash([8, 3, 2, 3]);
-        else ctx.setLineDash([]);
-
-        const cpX = (from.x + to.x) / 2;
-        ctx.moveTo(from.x, from.y);
-        ctx.bezierCurveTo(cpX, from.y, cpX, to.y, to.x, to.y);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Arrowhead
-        const angle = Math.atan2(to.y - to.y, to.x - cpX) || 0;
-        const ax = to.x - 18 * Math.cos(angle);
-        const ay = to.y - 18 * Math.sin(angle);
-        ctx.beginPath();
-        ctx.fillStyle = isHighlighted ? relColor : `${relColor}55`;
-        ctx.moveTo(to.x - 14 * Math.cos(angle), to.y - 14 * Math.sin(angle));
-        ctx.lineTo(ax - 5 * Math.cos(angle - Math.PI / 2), ay - 5 * Math.sin(angle - Math.PI / 2));
-        ctx.lineTo(ax + 5 * Math.cos(angle - Math.PI / 2), ay + 5 * Math.sin(angle - Math.PI / 2));
-        ctx.closePath();
-        ctx.fill();
-      });
-    });
-  }, [nodes, positions, selected, dagSize]);
 
   const sortedByInfluence = useMemo(() =>
     [...nodes].sort((a, b) => (scores[b.id]?.total || 0) - (scores[a.id]?.total || 0)),
@@ -192,119 +92,14 @@ export default function MultiverseExplorer() {
 
           {/* ============ DAG VIEW ============ */}
           {view === 'dag' && (
-            <div ref={dagContainerRef} style={{ position: 'relative', width: '100%', height: '100%', minHeight: 400 }}>
-              <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
-
-              {/* Nodes */}
-              {nodes.map(n => {
-                const pos = positions[n.id];
-                const sc = scores[n.id];
-                const isSelected = selected === n.id;
-                const isHovered = hoveredNode === n.id;
-                const isParentOfSelected = selectedNode?.parents?.includes(n.id);
-                const isChildOfSelected = n.parents?.includes(selected);
-                const dimmed = selected && !isSelected && !isParentOfSelected && !isChildOfSelected;
-                const author = AUTHORS[n.author];
-                const size = 16 + (sc?.normalized || 0) * 20;
-
-                return (
-                  <div key={n.id}
-                    onClick={() => { setSelected(isSelected ? null : n.id); setShowContent(false); }}
-                    onMouseEnter={() => setHoveredNode(n.id)}
-                    onMouseLeave={() => setHoveredNode(null)}
-                    style={{
-                      position: 'absolute',
-                      left: pos.x - size, top: pos.y - size,
-                      width: size * 2, height: size * 2,
-                      borderRadius: n.type === 'World' ? 6 : '50%',
-                      background: `radial-gradient(circle at 40% 35%, ${influenceColor(sc?.normalized || 0)}, rgba(15,12,25,0.9))`,
-                      border: `2px solid ${isSelected ? '#fff' : isHovered ? author?.color : 'rgba(255,255,255,0.15)'}`,
-                      boxShadow: isSelected
-                        ? `0 0 30px rgba(255,255,255,0.2), ${influenceGlow(sc?.normalized || 0)}`
-                        : influenceGlow(sc?.normalized || 0),
-                      opacity: dimmed ? 0.2 : 1,
-                      cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      transition: 'all 0.25s ease',
-                      zIndex: isSelected ? 20 : isHovered ? 15 : 10,
-                      transform: isHovered ? 'scale(1.15)' : 'scale(1)',
-                    }}
-                  >
-                    <span style={{ fontSize: size * 0.6, lineHeight: 1 }}>
-                      {TYPE_ICONS[n.type] || '\u25CF'}
-                    </span>
-                  </div>
-                );
-              })}
-
-              {/* Node labels */}
-              {nodes.map(n => {
-                const pos = positions[n.id];
-                const sc = scores[n.id];
-                const size = 16 + (sc?.normalized || 0) * 20;
-                const isSelected = selected === n.id;
-                const dimmed = selected && !isSelected && !selectedNode?.parents?.includes(n.id) && !n.parents?.includes(selected);
-
-                return (
-                  <div key={`label-${n.id}`} style={{
-                    position: 'absolute',
-                    left: pos.x - 50, top: pos.y + size + 4,
-                    width: 100, textAlign: 'center',
-                    fontSize: 9, color: dimmed ? 'rgba(255,255,255,0.15)' : '#a098b4',
-                    letterSpacing: '0.05em', pointerEvents: 'none',
-                    textShadow: '0 1px 4px rgba(0,0,0,0.8)',
-                    transition: 'opacity 0.2s',
-                  }}>
-                    {n.label}
-                  </div>
-                );
-              })}
-
-              {/* Epoch labels */}
-              {Array.from(new Set(nodes.map(n => n.epoch))).sort((a, b) => a - b).map((ep, i, arr) => (
-                <div key={`epoch-${ep}`} style={{
-                  position: 'absolute',
-                  left: 80 + (i / Math.max(arr.length - 1, 1)) * (dagSize.w - 160) - 30,
-                  bottom: 12, width: 60, textAlign: 'center',
-                  fontSize: 9, color: '#3a3550', letterSpacing: '0.15em', textTransform: 'uppercase',
-                }}>
-                  Epoch {ep}
-                </div>
-              ))}
-
-              {/* Hover tooltip */}
-              {hoveredData && !selected && (
-                <div style={{
-                  position: 'absolute',
-                  left: Math.min(positions[hoveredData.id].x + 30, 900),
-                  top: positions[hoveredData.id].y - 20,
-                  background: 'rgba(15,12,25,0.95)', border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 6, padding: '10px 14px', maxWidth: 260,
-                  fontSize: 11, lineHeight: 1.5, zIndex: 30,
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.5)', pointerEvents: 'none',
-                }}>
-                  <div style={{ fontWeight: 700, color: AUTHORS[hoveredData.author]?.color }}>
-                    {TYPE_ICONS[hoveredData.type]} {hoveredData.label}
-                  </div>
-                  <div style={{ color: '#8a829e', marginTop: 4 }}>{hoveredData.desc}</div>
-                </div>
-              )}
-
-              {/* Relation legend */}
-              <div style={{
-                position: 'absolute', left: 20, bottom: 40,
-                background: 'rgba(15,12,25,0.8)', borderRadius: 6,
-                padding: '10px 14px', fontSize: 10, lineHeight: 2,
-                border: '1px solid rgba(255,255,255,0.06)',
-              }}>
-                {Object.entries(RELATION_COLORS).filter(([r]) => ['extends','forks','merges','redefines','references'].includes(r)).map(([rel, col]) => (
-                  <div key={rel} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ width: 20, height: 2, background: col, borderRadius: 1 }} />
-                    <span style={{ color: '#8a829e', letterSpacing: '0.08em' }}>{rel}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <CanvasDAG
+              nodes={nodes}
+              scores={scores}
+              authors={AUTHORS}
+              selected={selected}
+              onSelect={(id) => { setSelected(id); setShowContent(false); }}
+              onHover={setHoveredNode}
+            />
           )}
 
           {/* ============ SCORES VIEW ============ */}

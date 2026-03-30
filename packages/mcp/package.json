@@ -1,0 +1,14 @@
+{
+  "name": "@verse-protocol/mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Verse Protocol — exposes world-building tools for AI agents",
+  "type": "module",
+  "main": "src/server.js",
+  "bin": {
+    "verse-mcp": "./src/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "license": "CC-BY-4.0"
+}

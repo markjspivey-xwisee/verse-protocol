@@ -261,6 +261,62 @@ GitHub Actions pipeline on every push to `master`:
 
 ---
 
+## AI Agent Integration
+
+Verse Protocol is designed for human-AI co-creation. Three integration paths:
+
+### Claude Code / Cline (MCP)
+
+Add the verse MCP server to your Claude Code config:
+
+```json
+{
+  "mcpServers": {
+    "verse": {
+      "command": "node",
+      "args": ["packages/mcp/src/server.js"],
+      "cwd": "/path/to/verse-repo"
+    }
+  }
+}
+```
+
+This exposes 8 tools: `verse_status`, `verse_score`, `verse_extend`, `verse_fork`, `verse_merge`, `verse_read_lore`, `verse_affordances`, `verse_search`. Plus all verse nodes as readable MCP resources.
+
+### Claude Code (CLAUDE.md)
+
+Drop the included `CLAUDE.md` into any verse repo. Claude Code automatically reads it and understands the protocol — verse commands, world rules, lore context, and how to create content that follows the world's systems.
+
+### OpenAI Codex / GPT Agents
+
+Use the function schemas at `packages/mcp/openai-functions.json` with OpenAI's function calling API:
+
+```python
+import json
+with open("packages/mcp/openai-functions.json") as f:
+    schemas = json.load(f)
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": "Extend the Cinder Library with a new character"}],
+    functions=schemas["functions"],
+)
+```
+
+### Autonomous World-Building Agent
+
+The built-in agent runs on a schedule or manually:
+
+```bash
+# Run the agent to auto-detect affordances and create lore-consistent nodes
+node packages/cli/bin/world-builder.js --max 3
+
+# Or trigger via GitHub Actions (daily at 3am UTC)
+gh workflow run world-builder-agent.yml
+```
+
+---
+
 ## Design Lineage
 
 Verse Protocol builds on:

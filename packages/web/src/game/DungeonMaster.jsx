@@ -305,6 +305,10 @@ export default function DungeonMaster({ currentNode, nodes, content, visible, on
             }}
               dangerouslySetInnerHTML={{
                 __html: msg.text
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')
+                  .replace(/"/g, '&quot;')
                   .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#e8e4f0">$1</strong>')
                   .replace(/\*(.+?)\*/g, '<em>$1</em>')
               }}

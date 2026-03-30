@@ -161,29 +161,41 @@ jobs:
         run: node packages/cli/bin/verse.js score 2>&1 || true
 
       - name: Commit and push
+        env:
+          NODE_ID: ${{ steps.create-verse.outputs.node_id }}
+          NODE_NAME: ${{ steps.create-verse.outputs.name }}
+          NODE_TYPE: ${{ steps.create-verse.outputs.type }}
+          NODE_RELATION: ${{ steps.create-verse.outputs.relation }}
+          NODE_PARENTS: ${{ steps.create-verse.outputs.parents }}
+          NODE_AUTHOR: ${{ steps.create-verse.outputs.author }}
+          NODE_EPOCH: ${{ steps.create-verse.outputs.epoch }}
+          ISSUE_NUM: ${{ steps.create-verse.outputs.issue_number }}
         run: |
           git config user.name "verse-bot"
           git config user.email "verse-bot@foxximediums.com"
           git add .verse/
-          git commit -m "verse(${{ steps.create-verse.outputs.relation }}): ${{ steps.create-verse.outputs.name }} (${{ steps.create-verse.outputs.node_id }})
-
-          ${{ steps.create-verse.outputs.type }} — ${{ steps.create-verse.outputs.relation }} from ${{ steps.create-verse.outputs.parents }}
-          Author: ${{ steps.create-verse.outputs.author }}
-          Epoch: ${{ steps.create-verse.outputs.epoch }}
-          Resolves #${{ steps.create-verse.outputs.issue_number }}"
+          git commit -m "verse(${NODE_RELATION}): ${NODE_NAME} (${NODE_ID}) - Resolves #${ISSUE_NUM}"
           git push
 
       - name: Comment on issue
         uses: actions/github-script@v7
+        env:
+          NODE_ID: ${{ steps.create-verse.outputs.node_id }}
+          NODE_NAME: ${{ steps.create-verse.outputs.name }}
+          NODE_TYPE: ${{ steps.create-verse.outputs.type }}
+          NODE_RELATION: ${{ steps.create-verse.outputs.relation }}
+          NODE_PARENTS: ${{ steps.create-verse.outputs.parents }}
+          NODE_EPOCH: ${{ steps.create-verse.outputs.epoch }}
+          NODE_AUTHOR: ${{ steps.create-verse.outputs.author }}
         with:
           script: |
-            const nodeId = '${{ steps.create-verse.outputs.node_id }}';
-            const name = '${{ steps.create-verse.outputs.name }}';
-            const type = '${{ steps.create-verse.outputs.type }}';
-            const relation = '${{ steps.create-verse.outputs.relation }}';
-            const parents = '${{ steps.create-verse.outputs.parents }}';
-            const epoch = '${{ steps.create-verse.outputs.epoch }}';
-            const author = '${{ steps.create-verse.outputs.author }}';
+            const nodeId = process.env.NODE_ID;
+            const name = process.env.NODE_NAME;
+            const type = process.env.NODE_TYPE;
+            const relation = process.env.NODE_RELATION;
+            const parents = process.env.NODE_PARENTS;
+            const epoch = process.env.NODE_EPOCH;
+            const author = process.env.NODE_AUTHOR;
 
             const icons = {
               World: '◆', Verse: '◇', Character: '☉', Location: '◈',

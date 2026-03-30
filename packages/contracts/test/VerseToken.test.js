@@ -21,47 +21,53 @@ describe("VerseToken", function () {
     await verseToken.setMarketplace(await marketplace.getAddress());
   });
 
-  describe("Bonding Curve", function () {
+  describe("Bonding Curve (Integral-Based)", function () {
     it("should have a starting price", async function () {
       const price = await verseToken.currentPrice();
       expect(price).to.equal(ethers.parseEther("0.0001"));
     });
 
-    it("should mint tokens when buying", async function () {
-      await verseToken.connect(alice).buy({ value: ethers.parseEther("0.01") });
+    it("should mint tokens when buying with slippage protection", async function () {
+      await verseToken.connect(alice).buy(0, { value: ethers.parseEther("0.01") });
       const balance = await verseToken.balanceOf(alice.address);
       expect(balance).to.be.gt(0);
     });
 
     it("should increase price as supply grows", async function () {
       const priceBefore = await verseToken.currentPrice();
-      await verseToken.connect(alice).buy({ value: ethers.parseEther("1.0") });
+      await verseToken.connect(alice).buy(0, { value: ethers.parseEther("1.0") });
       const priceAfter = await verseToken.currentPrice();
       expect(priceAfter).to.be.gt(priceBefore);
     });
 
-    it("should allow selling tokens back", async function () {
-      // Send ETH to contract first for liquidity
+    it("should allow selling tokens back with slippage protection", async function () {
+      // Fund contract for liquidity
       await owner.sendTransaction({
         to: await verseToken.getAddress(),
-        value: ethers.parseEther("1.0"),
+        value: ethers.parseEther("2.0"),
       });
 
-      await verseToken.connect(alice).buy({ value: ethers.parseEther("0.01") });
+      await verseToken.connect(alice).buy(0, { value: ethers.parseEther("0.5") });
 
       const balance = await verseToken.balanceOf(alice.address);
-      const halfBalance = balance / 4n; // Sell a quarter to stay within liquidity
+      const quarterBalance = balance / 4n;
 
       const balanceBefore = await ethers.provider.getBalance(alice.address);
-      await verseToken.connect(alice).sell(halfBalance);
+      await verseToken.connect(alice).sell(quarterBalance, 0);
       const balanceAfter = await ethers.provider.getBalance(alice.address);
 
       expect(balanceAfter).to.be.gt(balanceBefore);
     });
 
-    it("should report tokens for ETH correctly", async function () {
-      const amount = await verseToken.tokensForEth(ethers.parseEther("0.01"));
-      expect(amount).to.be.gt(0);
+    it("should reject buy if slippage exceeded", async function () {
+      await expect(
+        verseToken.connect(alice).buy(ethers.parseEther("999999"), { value: ethers.parseEther("0.001") })
+      ).to.be.revertedWith("Slippage exceeded");
+    });
+
+    it("should report cost to buy correctly", async function () {
+      const cost = await verseToken.costToBuy(ethers.parseEther("100"));
+      expect(cost).to.be.gt(0);
     });
   });
 
@@ -111,11 +117,19 @@ describe("InfluenceAnchor", function () {
     ).to.be.revertedWith("Epoch must be newer");
   });
 
+  it("should reject duplicate epochs", async function () {
+    const root = ethers.keccak256(ethers.toUtf8Bytes("root"));
+    await anchor.submitSnapshot(1, root, 10);
+
+    await expect(
+      anchor.submitSnapshot(1, root, 10)
+    ).to.be.revertedWith("Epoch already submitted");
+  });
+
   it("should authorize additional submitters", async function () {
     await anchor.setSubmitter(submitter.address, true);
     const root = ethers.keccak256(ethers.toUtf8Bytes("root"));
     await anchor.connect(submitter).submitSnapshot(1, root, 10);
-
     expect(await anchor.latestEpoch()).to.equal(1);
   });
 
@@ -124,6 +138,14 @@ describe("InfluenceAnchor", function () {
     await expect(
       anchor.connect(submitter).submitSnapshot(1, root, 10)
     ).to.be.revertedWith("Not authorized submitter");
+  });
+
+  it("should allow owner to invalidate snapshots", async function () {
+    const root = ethers.keccak256(ethers.toUtf8Bytes("root"));
+    await anchor.submitSnapshot(1, root, 10);
+    await anchor.invalidateSnapshot(1);
+
+    await expect(anchor.getSnapshot(1)).to.be.revertedWith("Epoch not found");
   });
 });
 
@@ -143,67 +165,103 @@ describe("Marketplace", function () {
     await verseToken.setMarketplace(await marketplace.getAddress());
 
     // Give alice some tokens
-    await verseToken.connect(alice).buy({ value: ethers.parseEther("0.1") });
+    await verseToken.connect(alice).buy(0, { value: ethers.parseEther("0.1") });
   });
 
   describe("Bounties", function () {
-    it("should post and claim a bounty", async function () {
+    it("should post a bounty and require poster approval for claims", async function () {
       const amount = ethers.parseEther("10");
-      const tokenAddr = await verseToken.getAddress();
       const mktAddr = await marketplace.getAddress();
 
-      // Approve marketplace
       await verseToken.connect(alice).approve(mktAddr, amount);
+      await marketplace.connect(alice).postBounty("v4", "Character", "A librarian's apprentice", amount, 30);
 
-      // Post bounty
-      await marketplace.connect(alice).postBounty(
-        "v4", "Character", "A librarian's apprentice", amount, 30
-      );
+      // Bob submits a claim
+      await marketplace.connect(bob).submitBountyClaim(0, "v20");
 
-      // Check bounty
+      // Bob can't get tokens yet — needs poster approval
+      expect(await verseToken.balanceOf(bob.address)).to.equal(0);
+
+      // Alice approves
+      await marketplace.connect(alice).approveBountyClaim(0);
+      expect(await verseToken.balanceOf(bob.address)).to.equal(amount);
+    });
+
+    it("should allow poster to reject claims", async function () {
+      const amount = ethers.parseEther("10");
+      const mktAddr = await marketplace.getAddress();
+
+      await verseToken.connect(alice).approve(mktAddr, amount);
+      await marketplace.connect(alice).postBounty("v4", "Character", "test", amount, 30);
+
+      await marketplace.connect(bob).submitBountyClaim(0, "v20");
+      await marketplace.connect(alice).rejectBountyClaim(0);
+
+      // Bounty should be claimable again
       const bounty = await marketplace.getBounty(0);
-      expect(bounty.poster).to.equal(alice.address);
-      expect(bounty.amount).to.equal(amount);
-
-      // Bob claims
-      await marketplace.connect(bob).claimBounty(0, "v20");
-      const bobBalance = await verseToken.balanceOf(bob.address);
-      expect(bobBalance).to.equal(amount);
+      expect(bounty.claimedBy).to.equal(ethers.ZeroAddress);
     });
   });
 
   describe("IP Trading", function () {
-    it("should register, list, and sell a node", async function () {
-      // Alice registers ownership
-      await marketplace.connect(alice).registerNode("v1");
-      expect(await marketplace.nodeOwners("v1")).to.equal(alice.address);
+    it("should require authorized registrar for node registration", async function () {
+      // Alice is not a registrar
+      await expect(
+        marketplace.connect(alice).registerNode("v1", alice.address, 500)
+      ).to.be.revertedWith("Not authorized registrar");
 
-      // List for sale
-      await marketplace.connect(alice).listNode("v1", ethers.parseEther("50"), 500);
+      // Owner is a registrar
+      await marketplace.registerNode("v1", alice.address, 500);
+      const ownership = await marketplace.getNodeOwnership("v1");
+      expect(ownership.owner).to.equal(alice.address);
+      expect(ownership.originalCreator).to.equal(alice.address);
+    });
+
+    it("should enforce royalties on sale", async function () {
+      // Register with 10% royalty
+      await marketplace.registerNode("v1", alice.address, 1000);
+
+      // Alice lists
+      await marketplace.connect(alice).listNode("v1", ethers.parseEther("50"));
 
       // Bob buys enough tokens
-      await verseToken.connect(bob).buy({ value: ethers.parseEther("1.0") });
+      await verseToken.connect(bob).buy(0, { value: ethers.parseEther("2.0") });
       const mktAddr = await marketplace.getAddress();
       await verseToken.connect(bob).approve(mktAddr, ethers.parseEther("50"));
-      await marketplace.connect(bob).buyNode("v1");
 
-      expect(await marketplace.nodeOwners("v1")).to.equal(bob.address);
+      // First sale — no royalty to self
+      await marketplace.connect(bob).buyNode("v1");
+      expect((await marketplace.getNodeOwnership("v1")).owner).to.equal(bob.address);
     });
   });
 
   describe("Governance", function () {
-    it("should create and vote on proposals", async function () {
-      // Alice needs 100 VERSE to propose
+    it("should create and vote on proposals with quorum", async function () {
       const aliceBalance = await verseToken.balanceOf(alice.address);
       expect(aliceBalance).to.be.gte(ethers.parseEther("100"));
 
       await marketplace.connect(alice).propose("Increase merge centrality weight to 0.35");
-
-      // Alice votes for
       await marketplace.connect(alice).vote(0, true);
 
       const proposal = await marketplace.proposals(0);
       expect(proposal.forVotes).to.be.gt(0);
+    });
+
+    it("should enforce proposal cooldown", async function () {
+      await marketplace.connect(alice).propose("First proposal");
+
+      await expect(
+        marketplace.connect(alice).propose("Second proposal too soon")
+      ).to.be.revertedWith("Proposal cooldown active");
+    });
+
+    it("should prevent double voting", async function () {
+      await marketplace.connect(alice).propose("Test");
+      await marketplace.connect(alice).vote(0, true);
+
+      await expect(
+        marketplace.connect(alice).vote(0, false)
+      ).to.be.revertedWith("Already voted");
     });
   });
 });

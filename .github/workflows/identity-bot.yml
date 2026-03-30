@@ -159,23 +159,28 @@ jobs:
             core.setOutput('linked_count', linkedCount);
 
       - name: Commit
+        env:
+          GH_USER: ${{ steps.claim.outputs.github_user }}
+          DISPLAY_NAME: ${{ steps.claim.outputs.display_name }}
+          ISSUE_NUM: ${{ github.event.issue.number }}
         run: |
           git config user.name "verse-bot"
           git config user.email "verse-bot@foxximediums.com"
           git add .verse/
-          git commit -m "identity: link @${{ steps.claim.outputs.github_user }} (${{ steps.claim.outputs.display_name }})
-
-          Linked identities for ${{ steps.claim.outputs.display_name }}
-          Resolves #${{ github.event.issue.number }}"
+          git commit -m "identity: link @${GH_USER} - Resolves #${ISSUE_NUM}"
           git push
 
       - name: Comment on issue
         uses: actions/github-script@v7
+        env:
+          DISPLAY_NAME: ${{ steps.claim.outputs.display_name }}
+          IDENTITY_LIST: ${{ steps.claim.outputs.identity_list }}
+          LINKED_COUNT: ${{ steps.claim.outputs.linked_count }}
         with:
           script: |
-            const displayName = '${{ steps.claim.outputs.display_name }}';
-            const identityList = `${{ steps.claim.outputs.identity_list }}`;
-            const linkedCount = '${{ steps.claim.outputs.linked_count }}';
+            const displayName = process.env.DISPLAY_NAME;
+            const identityList = process.env.IDENTITY_LIST;
+            const linkedCount = process.env.LINKED_COUNT;
 
             const comment = `## ☉ Identity Linked!
 

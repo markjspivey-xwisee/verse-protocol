@@ -12,11 +12,60 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
 import { join, resolve } from 'path';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 
 const args = process.argv.slice(2);
 const cmd = args[0];
 const cwd = process.cwd();
+
+// Input validation — prevent command injection
+function validateUsername(input) {
+  if (!/^[a-zA-Z0-9_.-]+$/.test(input)) {
+    console.error(`Invalid username format: "${input}". Only alphanumerics, hyphens, underscores, dots allowed.`);
+    process.exit(1);
+  }
+  return input;
+}
+
+function validateRepoPath(input) {
+  if (!/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(input)) {
+    console.error(`Invalid repo format: "${input}". Expected: owner/repo`);
+    process.exit(1);
+  }
+  return input;
+}
+
+function validateNodeId(input) {
+  if (!/^v\d+$/.test(input)) {
+    console.error(`Invalid node ID: "${input}". Expected format: v1, v2, etc.`);
+    process.exit(1);
+  }
+  return input;
+}
+
+// Safe shell execution via execFileSync (no shell interpolation)
+function ghApi(endpoint, jqFilter) {
+  try {
+    return execFileSync('gh', ['api', endpoint, '--jq', jqFilter], {
+      encoding: 'utf-8',
+      timeout: 15000,
+    }).trim();
+  } catch (err) {
+    throw new Error(`GitHub API call failed: ${err.message}`);
+  }
+}
+
+function ghApiRaw(endpoint) {
+  try {
+    const result = execFileSync('gh', ['api', endpoint, '--jq', '.content'], {
+      encoding: 'utf-8',
+      timeout: 10000,
+    }).trim();
+    return Buffer.from(result, 'base64').toString('utf-8');
+  } catch (err) {
+    throw new Error(`GitHub API call failed: ${err.message}`);
+  }
+}
 
 const VERSE_DIR = '.verse';
 const FEDERATION_DIR = 'federation';
@@ -49,7 +98,7 @@ function saveFederationLinks(root, data) {
 
 const commands = {
   async discover() {
-    const username = args[1];
+    const username = validateUsername(args[1] || '');
     if (!username) {
       console.error('Usage: verse-federation discover <github-username>');
       process.exit(1);
@@ -58,11 +107,10 @@ const commands = {
     console.log(`\n  ◆ FEDERATION — Discovering verse repos by ${username}\n`);
 
     try {
-      // Search for repos with .verse directories
-      const result = execSync(
-        `gh api "search/code?q=filename:manifest.json+path:.verse+user:${username}" --jq ".items[] | .repository.full_name"`,
-        { encoding: 'utf-8', timeout: 15000 }
-      ).trim();
+      const result = ghApi(
+        `search/code?q=filename:manifest.json+path:.verse+user:${username}`,
+        '.items[] | .repository.full_name'
+      );
 
       const repos = result ? [...new Set(result.split('\n'))] : [];
 
@@ -76,10 +124,7 @@ const commands = {
 
       for (const repo of repos) {
         try {
-          const manifest = execSync(
-            `gh api "repos/${repo}/contents/.verse/manifest.json" --jq ".content" | base64 -d`,
-            { encoding: 'utf-8', timeout: 10000 }
-          );
+          const manifest = ghApiRaw(`repos/${repo}/contents/.verse/manifest.json`);
           const data = JSON.parse(manifest);
           console.log(`  ◆ ${repo}`);
           console.log(`    Name:   ${data.name || '?'}`);
@@ -109,9 +154,9 @@ const commands = {
   },
 
   async link() {
-    const repoUrl = args[1];
-    const localNodeId = args[2];
-    const remoteNodeId = args[3] || 'v1';
+    const repoUrl = args[1] ? validateRepoPath(args[1]) : null;
+    const localNodeId = args[2] ? validateNodeId(args[2]) : null;
+    const remoteNodeId = args[3] ? validateNodeId(args[3]) : 'v1';
 
     if (!repoUrl || !localNodeId) {
       console.error('Usage: verse-federation link <owner/repo> <local-node-id> [remote-node-id]');
@@ -136,17 +181,11 @@ const commands = {
     console.log(`\n  ◆ FEDERATION — Linking ${repoUrl}:${remoteNodeId} → ${localNodeId}\n`);
 
     try {
-      const remoteManifest = execSync(
-        `gh api "repos/${repoUrl}/contents/.verse/manifest.json" --jq ".content" | base64 -d`,
-        { encoding: 'utf-8', timeout: 10000 }
-      );
+      const remoteManifest = ghApiRaw(`repos/${repoUrl}/contents/.verse/manifest.json`);
       const manifest = JSON.parse(remoteManifest);
 
       // Fetch remote node
-      const remoteNodeRaw = execSync(
-        `gh api "repos/${repoUrl}/contents/.verse/nodes/${remoteNodeId}.json" --jq ".content" | base64 -d`,
-        { encoding: 'utf-8', timeout: 10000 }
-      );
+      const remoteNodeRaw = ghApiRaw(`repos/${repoUrl}/contents/.verse/nodes/${remoteNodeId}.json`);
       const remoteNode = JSON.parse(remoteNodeRaw);
 
       // Save federation link
@@ -186,10 +225,7 @@ const commands = {
 
       // Also fetch and save remote content if available
       try {
-        const remoteContent = execSync(
-          `gh api "repos/${repoUrl}/contents/.verse/content/${remoteNodeId}.md" --jq ".content" | base64 -d`,
-          { encoding: 'utf-8', timeout: 10000 }
-        );
+        const remoteContent = ghApiRaw(`repos/${repoUrl}/contents/.verse/content/${remoteNodeId}.md`);
         writeFileSync(join(remoteDir, `${remoteNodeId}.md`), remoteContent);
       } catch {
         // Content might not exist
@@ -222,11 +258,8 @@ const commands = {
 
     try {
       // Fetch all node files
-      const filesRaw = execSync(
-        `gh api "repos/${repoUrl}/contents/.verse/nodes" --jq ".[].name"`,
-        { encoding: 'utf-8', timeout: 15000 }
-      ).trim();
-      const files = filesRaw.split('\n').filter(f => f.endsWith('.json'));
+      const filesRaw = ghApi(`repos/${repoUrl}/contents/.verse/nodes`, '.[].name');
+      const files = filesRaw.split('\n').filter(f => f.endsWith('.json') && /^v\d+\.json$/.test(f));
 
       const fedDir = ensureFederationDir(root);
       const remoteDir = join(fedDir, 'remotes', repoUrl.replace('/', '__'));
@@ -235,19 +268,13 @@ const commands = {
       let count = 0;
       for (const file of files) {
         try {
-          const nodeRaw = execSync(
-            `gh api "repos/${repoUrl}/contents/.verse/nodes/${file}" --jq ".content" | base64 -d`,
-            { encoding: 'utf-8', timeout: 10000 }
-          );
+          const nodeRaw = ghApiRaw(`repos/${repoUrl}/contents/.verse/nodes/${file}`);
           writeFileSync(join(remoteDir, file), nodeRaw);
           const node = JSON.parse(nodeRaw);
 
           // Try to get content too
           try {
-            const contentRaw = execSync(
-              `gh api "repos/${repoUrl}/contents/.verse/content/${file.replace('.json', '.md')}" --jq ".content" | base64 -d`,
-              { encoding: 'utf-8', timeout: 10000 }
-            );
+            const contentRaw = ghApiRaw(`repos/${repoUrl}/contents/.verse/content/${file.replace('.json', '.md')}`);
             writeFileSync(join(remoteDir, file.replace('.json', '.md')), contentRaw);
           } catch {
             // Content optional

@@ -197,8 +197,8 @@ export default function EpochReplay({ allNodes, onClose }) {
       </div>
 
       {/* Canvas */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        <canvas ref={canvasRef} style={{ width: 1000, height: 600 }} />
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+        <canvas ref={canvasRef} style={{ width: '100%', maxWidth: 1000, height: '100%', maxHeight: 600 }} />
 
         {/* Epoch indicator */}
         <div style={{
@@ -254,8 +254,8 @@ export default function EpochReplay({ allNodes, onClose }) {
 
       {/* Controls */}
       <div style={{
-        padding: '16px 24px', borderTop: '1px solid rgba(255,255,255,0.06)',
-        display: 'flex', alignItems: 'center', gap: 16,
+        padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.06)',
+        display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
       }}>
         {/* Play/Pause */}
         <button onClick={() => {

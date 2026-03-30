@@ -135,7 +135,7 @@ export default function EconomyView({ nodes, scores, authors }) {
   }
 
   return (
-    <div style={{ padding: '24px 32px', maxWidth: 1000, margin: '0 auto', overflowY: 'auto', height: '100%' }}>
+    <div style={{ padding: '16px', maxWidth: 1000, margin: '0 auto', overflowY: 'auto', height: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#ff6b35' }}>$VERSE Economy</h2>
@@ -153,7 +153,7 @@ export default function EconomyView({ nodes, scores, authors }) {
       {/* ============ DASHBOARD ============ */}
       {tab === 'dashboard' && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 24 }}>
             {[
               { label: 'Current Price', value: `${currentPrice.toFixed(6)} ETH`, color: '#ff6b35' },
               { label: 'Projected Supply', value: `${totalProjectedSupply.toFixed(0)} $VERSE`, color: '#4ade80' },
@@ -411,7 +411,7 @@ export default function EconomyView({ nodes, scores, authors }) {
             border: '1px solid rgba(255,255,255,0.06)', borderRadius: 6, marginBottom: 16,
           }}>
             <div style={{ fontSize: 10, color: '#8a829e', fontWeight: 700, marginBottom: 8, letterSpacing: '0.1em' }}>CURRENT PARAMETERS</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 11, color: '#8a829e' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 8, fontSize: 11, color: '#8a829e' }}>
               {[
                 ['Fork Depth Weight', '0.25'],
                 ['Structural Reuse Weight', '0.30'],

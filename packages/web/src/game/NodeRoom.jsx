@@ -30,7 +30,7 @@ export default function NodeRoom({ node, content, authors, onNavigate }) {
   const md = content[node.id];
 
   return (
-    <div style={{ padding: '24px 32px' }}>
+    <div style={{ padding: '16px' }}>
       {/* Room header */}
       <div style={{
         fontSize: 10, color: RELATION_COLORS[node.relation] || '#665f7a',

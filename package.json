@@ -14,5 +14,8 @@
     "test": "node --test packages/core/src/*.test.js",
     "verse": "node packages/cli/bin/verse.js",
     "federation": "node packages/cli/bin/federation.js"
+  },
+  "dependencies": {
+    "oauth": "^0.10.2"
   }
 }

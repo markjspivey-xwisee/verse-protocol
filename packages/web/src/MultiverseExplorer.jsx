@@ -52,9 +52,24 @@ export default function MultiverseExplorer() {
   const [view, setView] = useState('dag');
   const [showContent, setShowContent] = useState(false);
   const canvasRef = useRef(null);
+  const dagContainerRef = useRef(null);
+  const [dagSize, setDagSize] = useState({ w: 1200, h: 900 });
+
+  // Responsive DAG sizing
+  useEffect(() => {
+    function updateSize() {
+      if (dagContainerRef.current) {
+        const rect = dagContainerRef.current.getBoundingClientRect();
+        setDagSize({ w: Math.max(rect.width, 320), h: Math.max(rect.height, 400) });
+      }
+    }
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, [view]);
 
   const scores = useMemo(() => computeInfluence(nodes), [nodes]);
-  const positions = useMemo(() => layoutDAG(nodes), [nodes]);
+  const positions = useMemo(() => layoutDAG(nodes, dagSize.w, dagSize.h), [nodes, dagSize]);
 
   const selectedNode = nodes.find(n => n.id === selected);
   const hoveredData = nodes.find(n => n.id === hoveredNode);
@@ -65,10 +80,12 @@ export default function MultiverseExplorer() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = 1200 * dpr;
-    canvas.height = 900 * dpr;
+    const W = dagSize.w;
+    const H = dagSize.h;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
     ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, 1200, 900);
+    ctx.clearRect(0, 0, W, H);
 
     nodes.forEach(n => {
       if (!n.parents) return;
@@ -108,7 +125,7 @@ export default function MultiverseExplorer() {
         ctx.fill();
       });
     });
-  }, [nodes, positions, selected]);
+  }, [nodes, positions, selected, dagSize]);
 
   const sortedByInfluence = useMemo(() =>
     [...nodes].sort((a, b) => (scores[b.id]?.total || 0) - (scores[a.id]?.total || 0)),
@@ -136,9 +153,9 @@ export default function MultiverseExplorer() {
 
       {/* Header */}
       <header style={{
-        padding: '24px 32px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)',
+        padding: '12px 16px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        position: 'relative', zIndex: 10,
+        position: 'relative', zIndex: 10, flexWrap: 'wrap', gap: 8,
       }}>
         <div>
           <h1 style={{
@@ -152,7 +169,7 @@ export default function MultiverseExplorer() {
             Proof of Creativity &middot; Multiverse DAG Explorer &middot; v0.1
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 4 }}>
+        <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
           {['dag', 'scores', 'authors', 'world', 'economy'].map(v => (
             <button key={v} onClick={() => setView(v)} style={{
               padding: '6px 16px', fontSize: 11, letterSpacing: '0.1em',
@@ -175,8 +192,8 @@ export default function MultiverseExplorer() {
 
           {/* ============ DAG VIEW ============ */}
           {view === 'dag' && (
-            <div style={{ position: 'relative', width: 1200, height: 900, margin: '0 auto' }}>
-              <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: 1200, height: 900 }} />
+            <div ref={dagContainerRef} style={{ position: 'relative', width: '100%', height: '100%', minHeight: 400 }}>
+              <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
 
               {/* Nodes */}
               {nodes.map(n => {
@@ -247,7 +264,7 @@ export default function MultiverseExplorer() {
               {Array.from(new Set(nodes.map(n => n.epoch))).sort((a, b) => a - b).map((ep, i, arr) => (
                 <div key={`epoch-${ep}`} style={{
                   position: 'absolute',
-                  left: 80 + (i / Math.max(arr.length - 1, 1)) * (1200 - 160) - 30,
+                  left: 80 + (i / Math.max(arr.length - 1, 1)) * (dagSize.w - 160) - 30,
                   bottom: 12, width: 60, textAlign: 'center',
                   fontSize: 9, color: '#3a3550', letterSpacing: '0.15em', textTransform: 'uppercase',
                 }}>
@@ -292,7 +309,7 @@ export default function MultiverseExplorer() {
 
           {/* ============ SCORES VIEW ============ */}
           {view === 'scores' && (
-            <div style={{ padding: '24px 32px', maxWidth: 900, margin: '0 auto', overflowY: 'auto', height: '100%' }}>
+            <div style={{ padding: '16px', maxWidth: 900, margin: '0 auto', overflowY: 'auto', height: '100%' }}>
               <h2 style={{ fontSize: 14, letterSpacing: '0.15em', color: '#665f7a', textTransform: 'uppercase', marginBottom: 20 }}>
                 Influence Leaderboard &middot; Epoch 8
               </h2>
@@ -302,7 +319,7 @@ export default function MultiverseExplorer() {
                 return (
                   <div key={n.id} onClick={() => { setSelected(n.id); setView('dag'); }}
                     style={{
-                      display: 'grid', gridTemplateColumns: '30px 1fr 80px 80px 80px 80px 100px',
+                      display: 'grid', gridTemplateColumns: '30px 1fr auto',
                       alignItems: 'center', gap: 8, padding: '10px 16px',
                       background: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
                       borderRadius: 4, cursor: 'pointer', fontSize: 11,
@@ -369,7 +386,7 @@ export default function MultiverseExplorer() {
 
           {/* ============ AUTHORS VIEW ============ */}
           {view === 'authors' && (
-            <div style={{ padding: '24px 32px', maxWidth: 700, margin: '0 auto', overflowY: 'auto', height: '100%' }}>
+            <div style={{ padding: '16px', maxWidth: 700, margin: '0 auto', overflowY: 'auto', height: '100%' }}>
               <h2 style={{ fontSize: 14, letterSpacing: '0.15em', color: '#665f7a', textTransform: 'uppercase', marginBottom: 20 }}>
                 Author Rewards &middot; Epoch 8
               </h2>
@@ -460,9 +477,13 @@ export default function MultiverseExplorer() {
         {/* ============ DETAIL PANEL ============ */}
         {selected && selectedNode && (
           <div style={{
-            width: 320, borderLeft: '1px solid rgba(255,255,255,0.06)',
+            width: window.innerWidth < 768 ? '100%' : 320,
+            position: window.innerWidth < 768 ? 'fixed' : 'relative',
+            inset: window.innerWidth < 768 ? 0 : 'auto',
+            zIndex: window.innerWidth < 768 ? 50 : 'auto',
+            borderLeft: window.innerWidth < 768 ? 'none' : '1px solid rgba(255,255,255,0.06)',
             padding: '24px 20px', overflowY: 'auto',
-            background: 'rgba(10,8,18,0.6)',
+            background: window.innerWidth < 768 ? 'rgba(10,8,18,0.98)' : 'rgba(10,8,18,0.6)',
           }}>
             <button onClick={() => setSelected(null)} style={{
               float: 'right', background: 'none', border: 'none',

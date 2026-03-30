@@ -93,13 +93,15 @@ export default function WorldView({ nodes, scores, content, authors, selected, o
   const currentAffordances = affordances[currentId] || [];
   const peersHere = peers.filter(p => p.nodeId === currentId);
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
   return (
-    <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', height: '100%', overflow: 'hidden' }}>
       {/* Main content area */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {/* Breadcrumb */}
         <div style={{
-          padding: '12px 32px', borderBottom: '1px solid rgba(255,255,255,0.04)',
+          padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)',
           display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap',
           fontSize: 10, color: '#3a3550',
         }}>
@@ -208,7 +210,9 @@ export default function WorldView({ nodes, scores, content, authors, selected, o
 
       {/* Sidebar */}
       <div style={{
-        width: 300, borderLeft: '1px solid rgba(255,255,255,0.06)',
+        width: isMobile ? '100%' : 300,
+        borderLeft: isMobile ? 'none' : '1px solid rgba(255,255,255,0.06)',
+        borderTop: isMobile ? '1px solid rgba(255,255,255,0.06)' : 'none',
         padding: '20px 16px', overflowY: 'auto',
         background: 'rgba(10,8,18,0.6)',
       }}>

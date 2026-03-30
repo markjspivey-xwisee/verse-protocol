@@ -1,0 +1,15 @@
+{
+  "id": "v21",
+  "type": "Character",
+  "label": "The Kindler",
+  "author": "World Builder Agent",
+  "depth": 3,
+  "epoch": 20,
+  "parents": [
+    "v10"
+  ],
+  "relation": "extends",
+  "created": "2026-03-30T04:00:03.207Z",
+  "desc": "The Kindler is a figure who exists at the margins of The Depth Singers — neither fully accepted by the orthodox pyro-linguists nor cast out by the Order of Cinders. They possess an unusual gift: they can hear fire-speech that has already faded, residual meaning that lingers in the air after ash has settled. While the Archivist reads ash by touch, The Kindler reads the silence between burns. They believe that every conversation in fire leaves an echo, and these echoes accumulate into a kind of ambient meaning — a background hum of everything Ashenmere has ever said.",
+  "agentAuthored": true
+}

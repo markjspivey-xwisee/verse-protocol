@@ -1,0 +1,16 @@
+{
+  "id": "v4",
+  "type": "Location",
+  "label": "The Thorn Garden",
+  "author": "markj",
+  "depth": 1,
+  "epoch": 3,
+  "parents": [
+    "v1"
+  ],
+  "relation": "extends",
+  "created": "2026-03-30T03:48:24.702Z",
+  "commitHash": null,
+  "branch": null,
+  "desc": "A garden where ancient conversations have grown into an impassable maze of crystallized sound. The oldest thorns at the center hold the first words ever spoken."
+}

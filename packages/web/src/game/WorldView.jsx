@@ -3,7 +3,6 @@ import { buildWorldGraph, detectAffordances, ROOM_TYPES, ENTITY_TYPES } from './
 import NodeRoom from './NodeRoom.jsx';
 import ProposalBuilder from './ProposalBuilder.jsx';
 import ActivityFeed from './ActivityFeed.jsx';
-import DungeonMaster from './DungeonMaster.jsx';
 import EpochReplay from './EpochReplay.jsx';
 import { usePresence } from './usePresence.js';
 
@@ -38,7 +37,6 @@ const AFFORDANCE_ICONS = {
 export default function WorldView({ nodes, scores, content, authors, selected, onSelectNode }) {
   const [currentId, setCurrentId] = useState(selected || nodes[0]?.id || 'v1');
   const [proposal, setProposal] = useState(null);
-  const [dmVisible, setDmVisible] = useState(false);
   const [showReplay, setShowReplay] = useState(false);
 
   const graph = useMemo(() => buildWorldGraph(nodes), [nodes]);
@@ -372,15 +370,6 @@ export default function WorldView({ nodes, scores, content, authors, selected, o
           onClose={() => setProposal(null)}
         />
       )}
-
-      {/* Dungeon Master */}
-      <DungeonMaster
-        currentNode={current}
-        nodes={nodes}
-        content={content}
-        visible={dmVisible}
-        onToggle={() => setDmVisible(!dmVisible)}
-      />
 
       {/* Epoch Replay */}
       {showReplay && (

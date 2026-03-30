@@ -1,0 +1,16 @@
+{
+  "id": "v2",
+  "type": "System",
+  "label": "Resonance Thorns",
+  "author": "markj",
+  "depth": 1,
+  "epoch": 1,
+  "parents": [
+    "v1"
+  ],
+  "relation": "extends",
+  "created": "2026-03-30T03:48:23.916Z",
+  "commitHash": null,
+  "branch": null,
+  "desc": "The system by which sound hardens into crystal thorns. Pitch determines shape, volume determines size, emotion determines color."
+}

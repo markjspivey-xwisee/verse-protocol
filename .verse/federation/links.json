@@ -1,0 +1,16 @@
+{
+  "links": [
+    {
+      "id": "fed-1774842628662",
+      "localNodeId": "v1",
+      "remoteRepo": "markjspivey-xwisee/verse-thornveil",
+      "remoteNodeId": "v1",
+      "remoteLabel": "Thornveil",
+      "remoteType": "World",
+      "remoteName": "Thornveil",
+      "linkedAt": "2026-03-30T03:50:28.662Z",
+      "relation": "references"
+    }
+  ],
+  "discovered": []
+}

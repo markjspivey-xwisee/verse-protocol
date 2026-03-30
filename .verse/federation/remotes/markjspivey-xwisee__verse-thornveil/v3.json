@@ -1,0 +1,16 @@
+{
+  "id": "v3",
+  "type": "Character",
+  "label": "The Listener",
+  "author": "markj",
+  "depth": 1,
+  "epoch": 2,
+  "parents": [
+    "v1"
+  ],
+  "relation": "extends",
+  "created": "2026-03-30T03:48:24.307Z",
+  "commitHash": null,
+  "branch": null,
+  "desc": "A deaf woman who navigates the world by touching thorns and reading their vibrations. She is the only person who can hear what the thorns remember."
+}

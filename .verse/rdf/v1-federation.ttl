@@ -1,0 +1,6 @@
+@prefix verse: <https://ns.foxximediums.com/verse#> .
+
+<v1> verse:references <https://github.com/markjspivey-xwisee/verse-thornveil/.verse/nodes/v1> .
+<https://github.com/markjspivey-xwisee/verse-thornveil/.verse/nodes/v1> a verse:World ;
+    rdfs:label "Thornveil"@en ;
+    verse:repository <https://github.com/markjspivey-xwisee/verse-thornveil> .

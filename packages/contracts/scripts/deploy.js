@@ -5,29 +5,41 @@ async function main() {
   console.log("Deploying with account:", deployer.address);
   console.log("Balance:", hre.ethers.formatEther(await hre.ethers.provider.getBalance(deployer.address)), "ETH");
 
+  async function deployWithRetry(name, factory, args = []) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        console.log(`\n   Deploying ${name}... (attempt ${attempt + 1})`);
+        const contract = await factory.deploy(...args);
+        await contract.waitForDeployment();
+        const addr = await contract.getAddress();
+        console.log(`   ${name} deployed to: ${addr}`);
+        // Wait for nonce to propagate on public RPC
+        await new Promise(r => setTimeout(r, 5000));
+        return { contract, address: addr };
+      } catch (err) {
+        console.log(`   Attempt ${attempt + 1} failed: ${err.message}`);
+        if (attempt < 2) {
+          console.log("   Waiting 10s before retry...");
+          await new Promise(r => setTimeout(r, 10000));
+        } else throw err;
+      }
+    }
+  }
+
   // 1. Deploy VerseToken
-  console.log("\n1. Deploying VerseToken...");
+  console.log("\n1. VerseToken");
   const VerseToken = await hre.ethers.getContractFactory("VerseToken");
-  const verseToken = await VerseToken.deploy();
-  await verseToken.waitForDeployment();
-  const tokenAddress = await verseToken.getAddress();
-  console.log("   VerseToken deployed to:", tokenAddress);
+  const { contract: verseToken, address: tokenAddress } = await deployWithRetry("VerseToken", VerseToken);
 
   // 2. Deploy InfluenceAnchor
-  console.log("\n2. Deploying InfluenceAnchor...");
+  console.log("\n2. InfluenceAnchor");
   const InfluenceAnchor = await hre.ethers.getContractFactory("InfluenceAnchor");
-  const anchor = await InfluenceAnchor.deploy();
-  await anchor.waitForDeployment();
-  const anchorAddress = await anchor.getAddress();
-  console.log("   InfluenceAnchor deployed to:", anchorAddress);
+  const { contract: anchor, address: anchorAddress } = await deployWithRetry("InfluenceAnchor", InfluenceAnchor);
 
   // 3. Deploy Marketplace
-  console.log("\n3. Deploying Marketplace...");
+  console.log("\n3. Marketplace");
   const Marketplace = await hre.ethers.getContractFactory("Marketplace");
-  const marketplace = await Marketplace.deploy(tokenAddress);
-  await marketplace.waitForDeployment();
-  const marketplaceAddress = await marketplace.getAddress();
-  console.log("   Marketplace deployed to:", marketplaceAddress);
+  const { contract: marketplace, address: marketplaceAddress } = await deployWithRetry("Marketplace", Marketplace, [tokenAddress]);
 
   // 4. Wire contracts together
   console.log("\n4. Wiring contracts...");

@@ -1,0 +1,12 @@
+{
+  "id": "v1",
+  "type": "World",
+  "label": "Thornveil",
+  "author": "markj",
+  "depth": 0,
+  "epoch": 1,
+  "created": "2026-03-30T03:47:51.302Z",
+  "commitHash": null,
+  "branch": null,
+  "desc": "A world where sound crystallizes into thorns. Every word spoken grows into sharp, beautiful structures that persist until shattered by a louder sound."
+}

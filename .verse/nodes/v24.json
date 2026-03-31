@@ -1,0 +1,15 @@
+{
+  "id": "v24",
+  "type": "Character",
+  "label": "The Ash Reader",
+  "author": "World Builder Agent",
+  "depth": 3,
+  "epoch": 25,
+  "parents": [
+    "v19"
+  ],
+  "relation": "extends",
+  "created": "2026-03-31T03:56:29.882Z",
+  "desc": "The Ash Reader is a figure who exists at the margins of The Ash Weavers — neither fully accepted by the orthodox pyro-linguists nor cast out by the Order of Cinders. They possess an unusual gift: they can hear fire-speech that has already faded, residual meaning that lingers in the air after ash has settled. While the Archivist reads ash by touch, The Ash Reader reads the silence between burns. They believe that every conversation in fire leaves an echo, and these echoes accumulate into a kind of ambient meaning — a background hum of everything Ashenmere has ever said.",
+  "agentAuthored": true
+}

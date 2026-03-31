@@ -1,0 +1,9 @@
+@prefix verse: <https://ns.foxximediums.com/verse#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+<v23> a verse:Location ;
+    rdfs:label "The Smoke Reaches"@en ;
+    rdfs:comment """The Smoke Reaches lies within the reaches of The Ash Fields. The walls here bear ash-text older than any in the upper levels — not the careful calligraphy of deliberate burns, but wild, ungrammatical scrawls left by fires that spoke without being asked. The air tastes of ancient smoke. Something was said here, long ago, that no one was meant to hear. Pyro-linguists who visit report hearing a low hum in frequencies that don’t correspond to any known flame color — a grammar that predates the Flame Grammar tiles themselves."""@en ;
+    verse:authoredBy <agent:world-builder> ;
+    verse:extends <v20> .

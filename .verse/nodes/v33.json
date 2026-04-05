@@ -1,0 +1,15 @@
+{
+  "id": "v33",
+  "type": "Character",
+  "label": "The fire Keeper",
+  "author": "World Builder Agent",
+  "depth": 5,
+  "epoch": 38,
+  "parents": [
+    "v31"
+  ],
+  "relation": "extends",
+  "created": "2026-04-05T03:58:18.009Z",
+  "desc": "The fire Keeper is a figure who exists at the margins of The Silent Hearth — neither fully accepted by the orthodox pyro-linguists nor cast out by the Order of Cinders. They possess an unusual gift: they can hear fire-speech that has already faded, residual meaning that lingers in the air after ash has settled. While the Archivist reads ash by touch, The fire Keeper reads the silence between burns. They believe that every conversation in fire leaves an echo, and these echoes accumulate into a kind of ambient meaning — a background hum of everything Ashenmere has ever said.",
+  "agentAuthored": true
+}

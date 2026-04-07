@@ -1,0 +1,9 @@
+@prefix verse: <https://ns.foxximediums.com/verse#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+<v38> a verse:Character ;
+    rdfs:label "The fire Keeper"@en ;
+    rdfs:comment """The fire Keeper is a figure who exists at the margins of The Ember Vaults — neither fully accepted by the orthodox pyro-linguists nor cast out by the Order of Cinders. They possess an unusual gift: they can hear fire-speech that has already faded, residual meaning that lingers in the air after ash has settled. While the Archivist reads ash by touch, The fire Keeper reads the silence between burns. They believe that every conversation in fire leaves an echo, and these echoes accumulate into a kind of ambient meaning — a background hum of everything Ashenmere has ever said."""@en ;
+    verse:authoredBy <agent:world-builder> ;
+    verse:extends <v22> .

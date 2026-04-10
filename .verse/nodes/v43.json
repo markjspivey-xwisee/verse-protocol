@@ -1,0 +1,15 @@
+{
+  "id": "v43",
+  "type": "Character",
+  "label": "The fire Wanderer",
+  "author": "World Builder Agent",
+  "depth": 8,
+  "epoch": 53,
+  "parents": [
+    "v39"
+  ],
+  "relation": "extends",
+  "created": "2026-04-10T04:00:21.853Z",
+  "desc": "The fire Wanderer is a figure who exists at the margins of The fire Chamber — neither fully accepted by the orthodox pyro-linguists nor cast out by the Order of Cinders. They possess an unusual gift: they can hear fire-speech that has already faded, residual meaning that lingers in the air after ash has settled. While the Archivist reads ash by touch, The fire Wanderer reads the silence between burns. They believe that every conversation in fire leaves an echo, and these echoes accumulate into a kind of ambient meaning — a background hum of everything Ashenmere has ever said.",
+  "agentAuthored": true
+}

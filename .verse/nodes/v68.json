@@ -1,0 +1,15 @@
+{
+  "id": "v68",
+  "type": "Location",
+  "label": "The fire Gate",
+  "author": "World Builder Agent",
+  "depth": 13,
+  "epoch": 91,
+  "parents": [
+    "v66"
+  ],
+  "relation": "extends",
+  "created": "2026-04-22T04:00:04.564Z",
+  "desc": "The fire Gate lies within the reaches of The fire Path. The walls here bear ash-text older than any in the upper levels — not the careful calligraphy of deliberate burns, but wild, ungrammatical scrawls left by fires that spoke without being asked. The air tastes of ancient smoke. Something was said here, long ago, that no one was meant to hear. Pyro-linguists who visit report hearing a low hum in frequencies that don’t correspond to any known flame color — a grammar that predates the Flame Grammar tiles themselves.",
+  "agentAuthored": true
+}

@@ -1,0 +1,831 @@
+{
+  "epoch": 298,
+  "computedAt": "2026-06-30T04:23:28.597Z",
+  "merkleRoot": "3336204942a7de4e375f1ee6ce4a120a860444793cdef511c66093ff35e97745",
+  "scores": {
+    "v1": {
+      "total": 81.5,
+      "normalized": 1
+    },
+    "v10": {
+      "total": 0.55,
+      "normalized": 0.006748466257668713
+    },
+    "v100": {
+      "total": 19.799999999999997,
+      "normalized": 0.24294478527607358
+    },
+    "v101": {
+      "total": 18.95,
+      "normalized": 0.23251533742331287
+    },
+    "v102": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v103": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v104": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v105": {
+      "total": 24.349999999999998,
+      "normalized": 0.2987730061349693
+    },
+    "v106": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v107": {
+      "total": 23.5,
+      "normalized": 0.2883435582822086
+    },
+    "v108": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v109": {
+      "total": 22.65,
+      "normalized": 0.27791411042944786
+    },
+    "v11": {
+      "total": 3.324,
+      "normalized": 0.04078527607361963
+    },
+    "v110": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v111": {
+      "total": 21.799999999999997,
+      "normalized": 0.26748466257668707
+    },
+    "v112": {
+      "total": 18.1,
+      "normalized": 0.22208588957055217
+    },
+    "v113": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v114": {
+      "total": 17.25,
+      "normalized": 0.2116564417177914
+    },
+    "v115": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v116": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v117": {
+      "total": 20.95,
+      "normalized": 0.2570552147239264
+    },
+    "v118": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v119": {
+      "total": 20.1,
+      "normalized": 0.24662576687116566
+    },
+    "v12": {
+      "total": 1.8583333333333332,
+      "normalized": 0.02280163599182004
+    },
+    "v120": {
+      "total": 16.4,
+      "normalized": 0.20122699386503065
+    },
+    "v121": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v122": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v123": {
+      "total": 15.549999999999999,
+      "normalized": 0.19079754601226992
+    },
+    "v124": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v125": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v126": {
+      "total": 19.25,
+      "normalized": 0.2361963190184049
+    },
+    "v127": {
+      "total": 14.7,
+      "normalized": 0.1803680981595092
+    },
+    "v128": {
+      "total": 18.4,
+      "normalized": 0.22576687116564415
+    },
+    "v129": {
+      "total": 13.85,
+      "normalized": 0.16993865030674846
+    },
+    "v13": {
+      "total": 1.4523333333333333,
+      "normalized": 0.0178200408997955
+    },
+    "v130": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v131": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v132": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v133": {
+      "total": 17.549999999999997,
+      "normalized": 0.2153374233128834
+    },
+    "v134": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v135": {
+      "total": 16.7,
+      "normalized": 0.20490797546012268
+    },
+    "v136": {
+      "total": 13,
+      "normalized": 0.15950920245398773
+    },
+    "v137": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v138": {
+      "total": 15.85,
+      "normalized": 0.19447852760736195
+    },
+    "v139": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v14": {
+      "total": 1.6083333333333332,
+      "normalized": 0.019734151329243353
+    },
+    "v140": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v141": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v142": {
+      "total": 15,
+      "normalized": 0.18404907975460122
+    },
+    "v143": {
+      "total": 14.15,
+      "normalized": 0.1736196319018405
+    },
+    "v144": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v145": {
+      "total": 13.299999999999999,
+      "normalized": 0.16319018404907973
+    },
+    "v146": {
+      "total": 12.15,
+      "normalized": 0.149079754601227
+    },
+    "v147": {
+      "total": 11.3,
+      "normalized": 0.13865030674846626
+    },
+    "v148": {
+      "total": 12.45,
+      "normalized": 0.152760736196319
+    },
+    "v149": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v15": {
+      "total": 1.356,
+      "normalized": 0.016638036809815952
+    },
+    "v150": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v151": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v152": {
+      "total": 11.6,
+      "normalized": 0.14233128834355827
+    },
+    "v153": {
+      "total": 10.45,
+      "normalized": 0.1282208588957055
+    },
+    "v154": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v155": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v156": {
+      "total": 10.75,
+      "normalized": 0.13190184049079753
+    },
+    "v157": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v158": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v159": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v16": {
+      "total": 0.9823333333333333,
+      "normalized": 0.012053169734151329
+    },
+    "v160": {
+      "total": 9.899999999999999,
+      "normalized": 0.12147239263803679
+    },
+    "v161": {
+      "total": 9.05,
+      "normalized": 0.11104294478527608
+    },
+    "v162": {
+      "total": 9.6,
+      "normalized": 0.11779141104294479
+    },
+    "v163": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v164": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v165": {
+      "total": 8.2,
+      "normalized": 0.10061349693251533
+    },
+    "v166": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v167": {
+      "total": 8.75,
+      "normalized": 0.10736196319018405
+    },
+    "v168": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v169": {
+      "total": 7.8999999999999995,
+      "normalized": 0.09693251533742331
+    },
+    "v17": {
+      "total": 0.7583333333333333,
+      "normalized": 0.009304703476482616
+    },
+    "v170": {
+      "total": 7.35,
+      "normalized": 0.0901840490797546
+    },
+    "v171": {
+      "total": 7.05,
+      "normalized": 0.08650306748466258
+    },
+    "v172": {
+      "total": 6.5,
+      "normalized": 0.07975460122699386
+    },
+    "v173": {
+      "total": 6.2,
+      "normalized": 0.07607361963190185
+    },
+    "v174": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v175": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v176": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v177": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v178": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v179": {
+      "total": 5.35,
+      "normalized": 0.0656441717791411
+    },
+    "v18": {
+      "total": 0.25600000000000006,
+      "normalized": 0.0031411042944785284
+    },
+    "v180": {
+      "total": 5.65,
+      "normalized": 0.06932515337423313
+    },
+    "v181": {
+      "total": 4.8,
+      "normalized": 0.05889570552147239
+    },
+    "v182": {
+      "total": 4.5,
+      "normalized": 0.05521472392638037
+    },
+    "v183": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v184": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v185": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v186": {
+      "total": 3.9499999999999997,
+      "normalized": 0.048466257668711654
+    },
+    "v187": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v188": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v189": {
+      "total": 3.1,
+      "normalized": 0.03803680981595092
+    },
+    "v19": {
+      "total": 0.55,
+      "normalized": 0.006748466257668713
+    },
+    "v190": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v191": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v192": {
+      "total": 3.65,
+      "normalized": 0.04478527607361963
+    },
+    "v193": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v194": {
+      "total": 2.25,
+      "normalized": 0.027607361963190184
+    },
+    "v195": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v196": {
+      "total": 2.8,
+      "normalized": 0.03435582822085889
+    },
+    "v197": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v198": {
+      "total": 1.4,
+      "normalized": 0.017177914110429446
+    },
+    "v199": {
+      "total": 1.95,
+      "normalized": 0.02392638036809816
+    },
+    "v2": {
+      "total": 6.466666666666667,
+      "normalized": 0.07934560327198364
+    },
+    "v20": {
+      "total": 40.5,
+      "normalized": 0.49693251533742333
+    },
+    "v200": {
+      "total": 0.55,
+      "normalized": 0.006748466257668713
+    },
+    "v201": {
+      "total": 1.4,
+      "normalized": 0.017177914110429446
+    },
+    "v202": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v203": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v204": {
+      "total": 0.55,
+      "normalized": 0.006748466257668713
+    },
+    "v205": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v206": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v21": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v22": {
+      "total": 36.8,
+      "normalized": 0.4515337423312883
+    },
+    "v23": {
+      "total": 39.65,
+      "normalized": 0.48650306748466254
+    },
+    "v24": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v25": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v26": {
+      "total": 38.8,
+      "normalized": 0.4760736196319018
+    },
+    "v27": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v28": {
+      "total": 35.95,
+      "normalized": 0.44110429447852767
+    },
+    "v29": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v3": {
+      "total": 3.3083333333333336,
+      "normalized": 0.04059304703476483
+    },
+    "v30": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v31": {
+      "total": 35.099999999999994,
+      "normalized": 0.4306748466257668
+    },
+    "v32": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v33": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v34": {
+      "total": 37.95,
+      "normalized": 0.46564417177914114
+    },
+    "v35": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v36": {
+      "total": 37.099999999999994,
+      "normalized": 0.4552147239263803
+    },
+    "v37": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v38": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v39": {
+      "total": 36.25,
+      "normalized": 0.4447852760736196
+    },
+    "v4": {
+      "total": 39.358333333333334,
+      "normalized": 0.48292433537832313
+    },
+    "v40": {
+      "total": 34.25,
+      "normalized": 0.42024539877300615
+    },
+    "v41": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v42": {
+      "total": 35.4,
+      "normalized": 0.4343558282208589
+    },
+    "v43": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v44": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v45": {
+      "total": 33.4,
+      "normalized": 0.40981595092024536
+    },
+    "v46": {
+      "total": 34.55,
+      "normalized": 0.4239263803680981
+    },
+    "v47": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v48": {
+      "total": 32.55,
+      "normalized": 0.39938650306748463
+    },
+    "v49": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v5": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v50": {
+      "total": 33.7,
+      "normalized": 0.4134969325153375
+    },
+    "v51": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v52": {
+      "total": 31.7,
+      "normalized": 0.3889570552147239
+    },
+    "v53": {
+      "total": 32.849999999999994,
+      "normalized": 0.40306748466257664
+    },
+    "v54": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v55": {
+      "total": 30.849999999999998,
+      "normalized": 0.37852760736196317
+    },
+    "v56": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v57": {
+      "total": 32,
+      "normalized": 0.39263803680981596
+    },
+    "v58": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v59": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v6": {
+      "total": 2.774,
+      "normalized": 0.03403680981595092
+    },
+    "v60": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v61": {
+      "total": 30,
+      "normalized": 0.36809815950920244
+    },
+    "v62": {
+      "total": 31.15,
+      "normalized": 0.3822085889570552
+    },
+    "v63": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v64": {
+      "total": 29.15,
+      "normalized": 0.3576687116564417
+    },
+    "v65": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v66": {
+      "total": 28.3,
+      "normalized": 0.347239263803681
+    },
+    "v67": {
+      "total": 30.3,
+      "normalized": 0.3717791411042945
+    },
+    "v68": {
+      "total": 27.45,
+      "normalized": 0.33680981595092024
+    },
+    "v69": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v7": {
+      "total": 0.7583333333333333,
+      "normalized": 0.009304703476482616
+    },
+    "v70": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v71": {
+      "total": 26.599999999999998,
+      "normalized": 0.32638036809815946
+    },
+    "v72": {
+      "total": 29.45,
+      "normalized": 0.3613496932515337
+    },
+    "v73": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v74": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v75": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v76": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v77": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v78": {
+      "total": 25.75,
+      "normalized": 0.3159509202453988
+    },
+    "v79": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v8": {
+      "total": 45.394,
+      "normalized": 0.5569815950920245
+    },
+    "v80": {
+      "total": 24.9,
+      "normalized": 0.305521472392638
+    },
+    "v81": {
+      "total": 24.05,
+      "normalized": 0.2950920245398773
+    },
+    "v82": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v83": {
+      "total": 28.599999999999998,
+      "normalized": 0.350920245398773
+    },
+    "v84": {
+      "total": 23.2,
+      "normalized": 0.28466257668711653
+    },
+    "v85": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v86": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v87": {
+      "total": 22.35,
+      "normalized": 0.27423312883435585
+    },
+    "v88": {
+      "total": 27.75,
+      "normalized": 0.34049079754601225
+    },
+    "v89": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v9": {
+      "total": 4.966666666666667,
+      "normalized": 0.06094069529652352
+    },
+    "v90": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v91": {
+      "total": 26.9,
+      "normalized": 0.3300613496932515
+    },
+    "v92": {
+      "total": 21.5,
+      "normalized": 0.26380368098159507
+    },
+    "v93": {
+      "total": 20.65,
+      "normalized": 0.25337423312883434
+    },
+    "v94": {
+      "total": 26.05,
+      "normalized": 0.3196319018404908
+    },
+    "v95": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v96": {
+      "total": 25.2,
+      "normalized": 0.30920245398773005
+    },
+    "v97": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v98": {
+      "total": 0,
+      "normalized": 0
+    },
+    "v99": {
+      "total": 0,
+      "normalized": 0
+    }
+  }
+}

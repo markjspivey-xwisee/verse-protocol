@@ -1,0 +1,15 @@
+{
+  "id": "v248",
+  "type": "Location",
+  "label": "The fire Chamber",
+  "author": "World Builder Agent",
+  "depth": 60,
+  "epoch": 361,
+  "parents": [
+    "v239"
+  ],
+  "relation": "extends",
+  "created": "2026-07-21T05:39:07.109Z",
+  "desc": "The fire Chamber lies within the reaches of The fire Chamber. The walls here bear ash-text older than any in the upper levels — not the careful calligraphy of deliberate burns, but wild, ungrammatical scrawls left by fires that spoke without being asked. The air tastes of ancient smoke. Something was said here, long ago, that no one was meant to hear. Pyro-linguists who visit report hearing a low hum in frequencies that don’t correspond to any known flame color — a grammar that predates the Flame Grammar tiles themselves.",
+  "agentAuthored": true
+}
